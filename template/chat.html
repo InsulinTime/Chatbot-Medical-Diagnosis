@@ -1,0 +1,61 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDI Medical Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600&family=Ubuntu:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Chat Box -->
+        <div class="chat-box" id="chatBox">
+            <div class="chat-box-header">
+                <h3>EDI Medical Assistant</h3>
+                <p id="closeChat"><i class="fas fa-times"></i></p>
+            </div>
+            
+            <div class="chat-box-body" id="chatMessages">
+                <!-- Messages will appear here dynamically -->
+                <div class="chat-box-body-receive">
+                    <p>Hello! I'm EDI, your medical assistant. How can I help you today?</p>
+                    <span>Just now</span>
+                </div>
+            </div>
+            
+            <div class="chat-box-footer">
+                <button id="addExtra"><i class="fas fa-plus"></i></button>
+                <input id="userInput" placeholder="Describe your symptoms..." type="text" />
+                <button id="sendButton" class="send"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+        
+        <!-- Chat Toggle Button -->
+        <div class="chat-button" id="chatButton">
+            <span></span>
+        </div>
+        
+        <!-- Modal for additional options -->
+        <div class="modal" id="optionsModal">
+            <div class="modal-content">
+                <span class="modal-close-button">&times;</span>
+                <h3>Medical Resources</h3>
+                <div class="modal-options">
+                    <button class="modal-btn" id="symptomCheck">
+                        <i class="fas fa-stethoscope"></i> Symptom Checker
+                    </button>
+                    <button class="modal-btn" id="findClinic">
+                        <i class="fas fa-map-marker-alt"></i> Find Nearby Clinic
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

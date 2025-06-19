@@ -1,12 +1,17 @@
-sentence-transformers==2.2.2
-langchain
-flask
-pypdf
-python-dotenv
-pinecone[grpc]
-langchain-pinecone
-langchain_community
-transformers
-torch
-langchain_experimental
 -e .
+flask==3.0.3
+python-dotenv==1.0.1
+pinecone-client==3.2.2
+langchain-core  # Correct version that exists
+langchain-community
+langchain
+langchain-pinecone
+huggingface-hub==0.25.0
+langchain-huggingface
+transformers==4.40.1
+sentence-transformers==2.7.0
+torch==2.2.2
+accelerate==0.30.1
+tqdm==4.66.2
+pypdf==4.2.0
+faiss-cpu==1.7.4
