@@ -9,9 +9,12 @@ from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 from src.prompt import *
+from src.prompt import system_prompt, enhance_response
 import os
 from store_index import *
 from transformers import pipeline 
+
+load_dotenv()
 
 app = Flask(
     __name__,
@@ -72,14 +75,15 @@ except Exception as e:
 
 retriever = docsearch.as_retriever(search_type="similarity", search_kwargs={"k": 3})
 
-llm = HuggingFaceEndpoint(
-    repo_id="google/flan-t5-base",
+llm = pipeline (
     task="text2text-generation",
-    max_length=500,
-    temperature=0.4,
-    huggingfacehub_api_token=HUGGINGFACE_API_TOKEN
-)
-
+    model="google/flan-t5-xl",
+    token=os.getenv("HUGGINGFACE_API_TOKEN"),
+    max_length=1000,
+    temperature=0.6,
+    top_p=0.95,
+    top_k=50,
+    do_sample=True)
 
 prompt = ChatPromptTemplate.from_messages(
     [
@@ -106,39 +110,24 @@ def debug():
         "current_directory": os.getcwd(),
         "files_in_template": os.listdir(app.template_folder)
     }
-
+    
 @app.route("/get", methods=["POST"])
 def chat():
     try:
         data = request.get_json()
-        msg = data.get("msg", "").strip()
+        user_input = data.get("msg", "").strip()
         
-        print(f"\n=== New Query ===\n{msg}")
+        docs = retriever.invoke(user_input)
+        context = "\n".join(d.page_content[:300] for d in docs[:2])
         
-        # Debug: Test direct LLM response
-        print("\n[DEBUG] Testing direct LLM response...")
-        test_prompt = f"Answer briefly: {msg}"
-        direct_response = llm(test_prompt)
-        print(f"[DEBUG] Direct Response: {direct_response}")
+        prompt = system_prompt.format(context=context, input=user_input)
         
-        # Proceed with RAG
-        print("\n[DEBUG] Starting RAG processing...")
-        start_time = time.time()
-        response = rag_chain.invoke({"input": msg})
-        elapsed = time.time() - start_time
+        raw_response = llm(prompt, max_length=800)[0]['generated_text']
+        final_response = enhance_response(raw_response, llm)
         
-        print(f"\n[DEBUG] RAG Response:")
-        print("Full Response Object:", response)
-        print("Answer:", response.get("answer", "NO ANSWER FOUND"))
-        print(f"Processing Time: {elapsed:.2f}s")
-        
-        if not response or 'answer' not in response:
-            return jsonify({"error": "No response generated"}), 500
-            
-        return jsonify({"answer": response["answer"]})
+        return jsonify({"answer": final_response})
         
     except Exception as e:
-        print(f"\n[ERROR] Chat endpoint failed: {str(e)}")
         return jsonify({"error": str(e)}), 500
     
 print(f"Current working directory: {os.getcwd()}")
@@ -146,7 +135,7 @@ print(f"Template folder path: {os.path.abspath(app.template_folder)}")
 print(f"Static folder path: {os.path.abspath(app.static_folder)}")
 print(f"chat.html exists: {os.path.exists(os.path.join(app.template_folder, 'chat.html'))}")
 
-# Add this to verify your components are loaded correctly
+
 print("\n=== System Verification ===")
 print("Pinecone connection:", "Success" if 'docsearch' in locals() else "Failed")
 print("LLM initialization:", "Success" if 'llm' in locals() else "Failed")
