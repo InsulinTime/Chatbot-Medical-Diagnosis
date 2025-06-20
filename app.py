@@ -77,7 +77,7 @@ retriever = docsearch.as_retriever(search_type="similarity", search_kwargs={"k":
 
 llm = pipeline (
     task="text2text-generation",
-    model="google/flan-t5-xl",
+    model="google/flan-t5-large",
     token=os.getenv("HUGGINGFACE_API_TOKEN"),
     max_length=1000,
     temperature=0.6,
