@@ -3,6 +3,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 #from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
 import logging
+import json
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -24,6 +26,28 @@ def load_pdf_file(data_path):
     except Exception as e:
         logger.error(f"Failed to load PDFs: {str(e)}")
         return []
+    
+def load_medical_disease_data(file_path="Data/Medbook-home3/medical_disease.json"):
+    """Load and process the medical disease JSON data"""
+    try:
+        # Construct absolute path
+        abs_path = Path(__file__).parent.parent / file_path
+        
+        with open(abs_path, 'r') as f:
+            data = json.load(f)
+        
+        # Process the data into a more usable format
+        disease_data = {}
+        for disease in data.get('diseases', []):
+            name = disease.get('name', '').lower()
+            disease_data[name] = disease
+        
+        logger.info(f"Successfully loaded {len(disease_data)} diseases from JSON")
+        return disease_data
+    
+    except Exception as e:
+        logger.error(f"Failed to load medical disease data: {str(e)}")
+        return {}
     
 # Split the Data into Text Chunks
 def text_split(extracted_data):

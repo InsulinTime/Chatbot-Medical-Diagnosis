@@ -10,6 +10,9 @@ Guidelines:
 - Keep answers to 3-5 sentences
 - Reference South African health resources when possible
 - If unsure: "I'm not certain, but according to guidelines..."
+- For known diseases, use the structured disease information when available
+
+Available structured data includes: {disease_list}
 
 Context:
 {context}
@@ -17,13 +20,10 @@ Context:
 Question: {input}"""
 
 def enhance_response(response: str, llm) -> str:
-    """
-    Improves short or vague responses
-    Example: Turns "HIV is a virus" -> "HIV is a virus that attacks the immune system..."
-    """
+    """Improves short or vague responses with South African context"""
     if len(response.split()) < 10 or "I don't know" in response:
         enhanced = llm(
-            f"Improve this medical response for South Africa: {response}",
+            f"Improve this medical response for rural South African clinics: {response}",
             max_length=300,
             temperature=0.3
         )[0]['generated_text']

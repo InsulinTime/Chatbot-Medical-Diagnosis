@@ -689,7 +689,7 @@
             "Oxygen Therapy: May be necessary to improve oxygen levels in the blood.",
             "IV Fluids: Used to prevent or treat dehydration, especially in severe cases.",
             "Corticosteroids or Immunosuppressants: May be prescribed to reduce lung inflammation.",
-            "Supportive Care: Includes rest, increased fluid intake, fever management (acetaminophen or ibuprofen), and cough management (coughing helps clear mucus).",
+            "Supportive Care: Includes rest, increased fluid intake, fever management (acetaminophen or ibuprofen), and cough management (coughing helps clear mucus)."
         ],
         "prevention":[
             "Get vaccinated. Vaccines are available to prevent some types of pneumonia and the flu. Talk with your doctor about getting these shots. The vaccination guidelines have changed over time so make sure to review your vaccination status with your doctor even if you recall previously receiving a pneumonia vaccine.",
@@ -1354,7 +1354,7 @@
         ],
         "high_risk_areas":[
             "Lung cancer rates vary geographically, with some areas having higher incidence and mortality than others. Generally, regions with high smoking prevalence and exposure to certain environmental hazards tend to have higher lung cancer rates. Specific countries and regions in Eastern Europe, Western Asia, and Northern Africa have particularly high mortality rates among men, while North America and Northern Europe have high rates among women.",
-	        "In South Africa, lung cancer is a significant health concern, particularly among specific demographics and geographical locations. Factors like smoking, exposure to asbestos, and industrial pollutants contribute to increased risk. While specific "high-risk areas" aren't definitively mapped, certain provinces and communities face greater burdens due to a combination of socioeconomic factors, occupational hazards, and lifestyle choices."
+	        "In South Africa, lung cancer is a significant health concern, particularly among specific demographics and geographical locations. Factors like smoking, exposure to asbestos, and industrial pollutants contribute to increased risk. While specific 'high-risk areas' aren't definitively mapped, certain provinces and communities face greater burdens due to a combination of socioeconomic factors, occupational hazards, and lifestyle choices."
         ],
         "summary":[
             "Lung cancer is a disease where abnormal cells grow uncontrollably in the lungs, potentially spreading to other parts of the body. It's the leading cause of cancer deaths worldwide. The two main types are non-small cell lung cancer (NSCLC) and small cell lung cancer (SCLC), with NSCLC being more common. Smoking is the primary risk factor, but lung cancer can also occur in non-smokers.",
