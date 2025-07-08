@@ -86,17 +86,14 @@ def find_matching_disease(user_input: str) -> Optional[Dict[str, Any]]:
     """Find matching disease using improved matching logic."""
     user_input = user_input.lower()
     
-    # Check for exact matches first
     for name, data in medical_disease_data.items():
         if name.lower() in user_input:
             return data
     
-    # Check for name variations without spaces
     for name, data in medical_disease_data.items():
         if name.lower().replace(" ", "") in user_input.replace(" ", ""):
             return data
     
-    # Check for symptom matches
     symptom_counts = {}
     for name, data in medical_disease_data.items():
         for symptom in data.get('symptoms', []):
@@ -105,62 +102,101 @@ def find_matching_disease(user_input: str) -> Optional[Dict[str, Any]]:
     
     if symptom_counts:
         best_match = max(symptom_counts.items(), key=lambda x: x[1])
-        if best_match[1] >= 2:  # Require at least 2 matching symptoms
+        if best_match[1] >= 2: 
             return medical_disease_data[best_match[0]]
     
     return None
 
 def format_disease_response(disease_info: Dict[str, Any], rag_context: str = "") -> str:
-    """Format disease information into a structured response."""
+    """Format disease information into a structured response with South African context."""
     sections = [
-        ("Symptoms", "symptoms"),
-        ("How It's Contracted", "how_contracted"),
-        ("Diagnosis", "diagnosis"),
-        ("Treatment", "treatment"),
-        ("Prevention", "prevention"),
-        ("High Risk Areas", "high_risk_areas")
+        ("Symptoms", "symptoms", "sa-green"),
+        ("How It's Contracted", "how_contracted", "sa-yellow"),
+        ("Diagnosis", "diagnosis", "sa-blue"),
+        ("Treatment", "treatment", "sa-blue"),
+        ("Prevention", "prevention", "sa-green"),
+        ("High Risk Areas in SA", "high_risk_areas", "sa-red")
     ]
     
     response = [
-        f"<strong>{disease_info['name'].title()}</strong>",
-        f"<em>{disease_info['description']}</em>",
-        ""
+        f"<div class='disease-header'><strong>{disease_info['name'].title()}</strong>",
+        f"<em>{disease_info['description']}</em></div>"
     ]
     
-    # Add RAG context if available
     if rag_context:
         response.extend([
-            "<strong>Additional Information:</strong>",
-            rag_context,
-            ""
+            "<div class='additional-info'><strong>Additional Information:</strong>",
+            f"<p>{rag_context}</p></div>"
         ])
     
-    # Add structured sections
-    for title, key in sections:
+    for title, key, color_class in sections:
         content = disease_info.get(key)
         if content:
-            response.append(f"<strong>{title}:</strong>")
+            response.append(f"<div class='disease-section {color_class}'><strong>{title}:</strong>")
             if isinstance(content, list):
-                response.extend(f"• {item}" for item in content)
+                response.append("<ul>")
+                response.extend(f"<li>{item}</li>" for item in content)
+                response.append("</ul>")
             else:
-                response.append(f"• {content}")
-            response.append("")
+                response.append(f"<p>{content}</p>")
+            response.append("</div>")
     
-    # Add South Africa-specific guidance
-    response.append("<strong>For South African Clinics:</strong>")
-    response.append(f"• {get_south_africa_guidance(disease_info)}")
-    response.append("")
+    sa_guidance = get_south_africa_guidance(disease_info)
+    response.extend([
+        "<div class='sa-guidance'><strong>For South African Clinics:</strong>",
+        f"<p>{sa_guidance}</p></div>"
+    ])
     
-    # Add summary
-    if 'summary' in disease_info:
-        summary = disease_info['summary']
-        response.append("<strong>Summary:</strong>")
-        if isinstance(summary, list):
-            response.extend(f"• {point}" for point in summary)
-        else:
-            response.append(f"• {summary}")
+    if disease_info.get('urgent'):
+        response.extend([
+            "<div class='urgent-warning'><strong>URGENT:</strong>",
+            "<p>This condition may require immediate medical attention. Please seek care now if you have:</p>",
+            "<ul>",
+            *[f"<li>{symptom}</li>" for symptom in disease_info['urgent_symptoms']],
+            "</ul></div>"
+        ])
     
-    return "\n".join(response)
+    return "".join(response)
+
+def get_clinic_info(location: str) -> str:
+    """Generate mock clinic information based on location"""
+    clinics = {
+        "johannesburg": [
+            {
+                "name": "Johannesburg Central Clinic",
+                "address": "123 Health St, Johannesburg, 2000",
+                "hours": "Mon-Fri: 7:30AM-4PM, Sat: 8AM-12PM",
+                "phone": "011 123 4567"
+            }
+        ],
+        "cape town": [
+            {
+                "name": "Cape Town District Health Facility",
+                "address": "789 Wellness Rd, Cape Town, 8000",
+                "hours": "Mon-Fri: 8AM-5PM",
+                "phone": "021 987 6543"
+            }
+        ]
+    }
+    
+    location_key = location.lower()
+    if location_key in clinics:
+        clinic_list = []
+        for clinic in clinics[location_key]:
+            clinic_list.append(
+                f"<div class='clinic-card'>"
+                f"<div class='clinic-name'>{clinic['name']}</div>"
+                f"<div class='clinic-address'>{clinic['address']}</div>"
+                f"<div class='clinic-hours'><i class='far fa-clock'></i> {clinic['hours']}</div>"
+                f"<div class='clinic-phone'><i class='fas fa-phone'></i> {clinic['phone']}</div>"
+                f"</div>"
+            )
+        return (
+            f"<h4>Clinics near {location.title()}:</h4>"
+            + "".join(clinic_list)
+            + "<p>Remember to bring your ID and medical card if you have one.</p>"
+        )
+    return f"I couldn't find clinics in {location}. Please try a nearby city name."
 
 def get_south_africa_guidance(disease_info: Dict[str, Any]) -> str:
     """Generate South Africa-specific guidance for a disease."""

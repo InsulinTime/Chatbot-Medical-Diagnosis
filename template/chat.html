@@ -5,54 +5,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EDI Medical Assistant</title>
+    <title>EDI - South African Medical Assistant</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600&family=Ubuntu:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
 <body>
     <div class="chat-container">
         <!-- Chat Box -->
         <div class="chat-box" id="chatBox">
             <div class="chat-box-header">
-                <h3>EDI Medical Assistant</h3>
-                <p id="closeChat"><i class="fas fa-times"></i></p>
+                <div class="header-left">
+                    <div class="avatar">
+                        <img src="{{ url_for('static', filename='images/doctor-avatar.png') }}" alt="EDI Avatar">
+                    </div>
+                    <div class="header-info">
+                        <h3>EDI Medical Assistant</h3>
+                        <p class="status"><span class="status-indicator"></span> Online</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button id="printBtn" title="Print Summary"><i class="fas fa-print"></i></button>
+                    <button id="closeChat" title="Minimize"><i class="fas fa-minus"></i></button>
+                </div>
             </div>
             
             <div class="chat-box-body" id="chatMessages">
-                <!-- Messages will appear here dynamically -->
-                <div class="chat-box-body-receive">
-                    <p>Hello! I'm EDI, your medical assistant. How can I help you today?</p>
+                <!-- Welcome message with quick action buttons -->
+                <div class="chat-box-body-receive welcome-message animate__animated animate__fadeIn">
+                    <div class="welcome-content">
+                        <img src="{{ url_for('static', filename='images/sa-health-logo.png') }}" alt="SA Health" class="welcome-logo">
+                        <h4>Hello! I'm EDI, your South African Health Assistant</h4>
+                        <p>How can I help you today? You can describe your symptoms, ask about medications, or get information about local clinics.</p>
+                        
+                        <div class="quick-actions">
+                            <button class="quick-btn" data-prompt="I have a headache and fever">
+                                <i class="fas fa-head-side-cough"></i> Fever & Headache
+                            </button>
+                            <button class="quick-btn" data-prompt="I have stomach pain and diarrhea">
+                                <i class="fas fa-stomach"></i> Stomach Issues
+                            </button>
+                            <button class="quick-btn" data-prompt="Where is the nearest clinic?">
+                                <i class="fas fa-map-marker-alt"></i> Find Clinic
+                            </button>
+                        </div>
+                    </div>
                     <span>Just now</span>
                 </div>
             </div>
             
             <div class="chat-box-footer">
-                <button id="addExtra"><i class="fas fa-plus"></i></button>
-                <input id="userInput" placeholder="Describe your symptoms..." type="text" />
-                <button id="sendButton" class="send"><i class="fas fa-paper-plane"></i></button>
+                <button id="addExtra" title="More options"><i class="fas fa-ellipsis-h"></i></button>
+                <div class="input-container">
+                    <input id="userInput" placeholder="Describe your symptoms or ask a question..." type="text" />
+                    <button id="voiceBtn" title="Voice input"><i class="fas fa-microphone"></i></button>
+                </div>
+                <button id="sendButton" class="send" title="Send"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
         
         <!-- Chat Toggle Button -->
-        <div class="chat-button" id="chatButton">
-            <span></span>
+        <div class="chat-button animate__animated animate__bounceIn" id="chatButton">
+            <i class="fas fa-comment-medical"></i>
+            <span class="notification-badge">1</span>
         </div>
         
         <!-- Modal for additional options -->
         <div class="modal" id="optionsModal">
-            <div class="modal-content">
+            <div class="modal-content animate__animated animate__fadeInUp">
                 <span class="modal-close-button">&times;</span>
-                <h3>Medical Resources</h3>
+                <h3><i class="fas fa-medkit"></i> Health Resources</h3>
                 <div class="modal-options">
                     <button class="modal-btn" id="symptomCheck">
-                        <i class="fas fa-stethoscope"></i> Symptom Checker
+                        <i class="fas fa-stethoscope"></i> 
+                        <div>
+                            <strong>Symptom Checker</strong>
+                            <small>Start guided symptom assessment</small>
+                        </div>
                     </button>
                     <button class="modal-btn" id="findClinic">
-                        <i class="fas fa-map-marker-alt"></i> Find Nearby Clinic
+                        <i class="fas fa-clinic-medical"></i>
+                        <div>
+                            <strong>Find Clinic</strong>
+                            <small>Locate nearest healthcare facility</small>
+                        </div>
+                    </button>
+                    <button class="modal-btn" id="emergencyHelp">
+                        <i class="fas fa-ambulance"></i>
+                        <div>
+                            <strong>Emergency Help</strong>
+                            <small>Immediate medical assistance</small>
+                        </div>
+                    </button>
+                    <button class="modal-btn" id="medicationInfo">
+                        <i class="fas fa-pills"></i>
+                        <div>
+                            <strong>Medication Info</strong>
+                            <small>Learn about medicines</small>
+                        </div>
+                    </button>
+                    <button class="modal-btn" id="printSummary">
+                        <i class="fas fa-file-medical"></i>
+                        <div>
+                            <strong>Print Summary</strong>
+                            <small>Get a copy for your doctor</small>
+                        </div>
                     </button>
                 </div>
+                
+                <div class="modal-footer">
+                    <p>For life-threatening emergencies, call <strong>10177</strong> (Ambulance) or <strong>112</strong> (Cell phone emergency)</p>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Add this modal for emergency situations -->
+    <div class="modal" id="emergencyModal">
+        <div class="modal-content emergency-content animate__animated animate__headShake">
+            <h3><i class="fas fa-exclamation-triangle"></i> Emergency Assistance</h3>
+            <div class="emergency-actions">
+                <button class="emergency-btn" id="callAmbulance">
+                    <i class="fas fa-ambulance"></i> Call Ambulance (10177)
+                </button>
+                <button class="emergency-btn" id="nearestHospital">
+                    <i class="fas fa-hospital"></i> Nearest Hospital
+                </button>
+                <button class="emergency-btn" id="poisonControl">
+                    <i class="fas fa-biohazard"></i> Poison Control (0861 555 777)
+                </button>
+            </div>
+            <div class="emergency-symptoms">
+                <h4>Seek immediate care for:</h4>
+                <ul>
+                    <li>Chest pain or pressure</li>
+                    <li>Difficulty breathing</li>
+                    <li>Severe bleeding</li>
+                    <li>Sudden weakness or numbness</li>
+                    <li>Suicidal thoughts</li>
+                </ul>
+            </div>
+            <button class="close-emergency" id="closeEmergency">Cancel</button>
         </div>
     </div>
 

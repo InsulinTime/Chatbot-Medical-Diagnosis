@@ -1,33 +1,58 @@
-/* Base Styles */
-body {
-    background: #E8EBF5;
-    padding: 0;
-    margin: 0;
-    font-family: 'Raleway', sans-serif;
+/* Base Styles with South African color theme */
+:root {
+    --primary: #2C50EF;
+    --primary-dark: #1A3BC7;
+    --secondary: #FF8200; /* South African orange */
+    --danger: #E74C3C;
+    --success: #27AE60;
+    --warning: #F39C12;
+    --light: #F5F7FA;
+    --dark: #2C3E50;
+    --text: #333333;
+    --text-light: #7F8C8D;
+    --sa-green: #007749; /* South African green */
+    --sa-yellow: #FFB81C; /* South African yellow */
+    --sa-red: #E03C31; /* South African red */
+    --sa-blue: #00A1DE; /* South African blue */
 }
 
-/* Chat Container */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #f0f2f5;
+    font-family: 'Poppins', 'Open Sans', sans-serif;
+    color: var(--text);
+    line-height: 1.6;
+}
+
+/* Chat Container - Now with South African flag colours accent */
 .chat-container {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 30px;
+    right: 30px;
     z-index: 1000;
+    font-size: 14px;
 }
 
-/* Chat Box */
+/* Chat Box - Modern card with subtle shadow */
 .chat-box {
-    height: 500px;
-    width: 350px;
+    height: 600px;
+    width: 380px;
     background: #fff;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     overflow: hidden;
     transform: translateY(20px);
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(0,0,0,0.05);
 }
 
 .chat-box.active {
@@ -36,70 +61,191 @@ body {
     visibility: visible;
 }
 
-/* Header */
+/* Header with gradient background */
 .chat-box-header {
-    background: #2C50EF;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--sa-blue) 100%);
     color: white;
     padding: 15px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
 }
 
-.chat-box-header h3 {
-    margin: 0;
-    font-family: 'Ubuntu', sans-serif;
-    font-weight: 500;
-    font-size: 18px;
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.chat-box-header p {
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.header-info h3 {
     margin: 0;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.status {
+    font-size: 11px;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #2ECC71;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.header-right {
+    display: flex;
+    gap: 10px;
+}
+
+.header-right button {
+    background: transparent;
+    border: none;
+    color: white;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 14px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
 }
 
-/* Chat Body */
+.header-right button:hover {
+    opacity: 1;
+}
+
+/* Chat Body - Improved message display */
 .chat-box-body {
     flex: 1;
     padding: 15px;
     overflow-y: auto;
     background: #f8f9fa;
+    background-image: url('../images/chat-bg-pattern.png');
+    background-size: 300px;
+    background-blend-mode: overlay;
+    background-attachment: local;
 }
 
-/* Message Styles */
+/* Message Styles - More modern bubbles */
 .chat-box-body-send,
 .chat-box-body-receive {
-    max-width: 80%;
-    padding: 10px 15px;
+    max-width: 85%;
+    padding: 12px 16px;
     border-radius: 18px;
     margin-bottom: 12px;
     position: relative;
     clear: both;
+    line-height: 1.4;
+    font-size: 14px;
+    animation-duration: 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .chat-box-body-send {
-    background: #2C50EF;
+    background: var(--primary);
     color: white;
     float: right;
-    border-bottom-right-radius: 5px;
+    border-bottom-right-radius: 4px;
+    animation-name: slideInRight;
 }
 
 .chat-box-body-receive {
     background: white;
-    color: #333;
+    color: var(--text);
     float: left;
-    border-bottom-left-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-bottom-left-radius: 4px;
+    animation-name: slideInLeft;
+}
+
+.welcome-message {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.welcome-content {
+    text-align: center;
+}
+
+.welcome-logo {
+    width: 80px;
+    margin-bottom: 10px;
+}
+
+.welcome-message h4 {
+    color: var(--primary);
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.welcome-message p {
+    color: var(--text-light);
+    font-size: 13px;
+    margin-bottom: 15px;
+}
+
+.quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.quick-btn {
+    background: rgba(44, 80, 239, 0.1);
+    border: none;
+    border-radius: 20px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.quick-btn:hover {
+    background: rgba(44, 80, 239, 0.2);
+}
+
+.quick-btn i {
+    font-size: 14px;
 }
 
 .chat-box-body-send p,
 .chat-box-body-receive p {
     margin: 0;
-    font-size: 14px;
-    line-height: 1.4;
 }
 
 .chat-box-body-send span,
@@ -108,46 +254,139 @@ body {
     font-size: 10px;
     color: rgba(255,255,255,0.7);
     text-align: right;
-    margin-top: 5px;
+    margin-top: 6px;
 }
 
 .chat-box-body-receive span {
-    color: #888;
+    color: var(--text-light);
 }
 
-/* Footer */
-.chat-box-footer {
+/* Disease information formatting */
+.disease-info {
+    margin-top: 10px;
+    border-left: 3px solid var(--primary);
+    padding-left: 10px;
+}
+
+.disease-info h4 {
+    color: var(--primary);
+    margin-bottom: 5px;
+    font-size: 15px;
+}
+
+.disease-info ul {
+    padding-left: 20px;
+    margin: 5px 0;
+}
+
+.disease-info li {
+    margin-bottom: 3px;
+    font-size: 13px;
+}
+
+.urgent-alert {
+    background: #FDE8E8;
+    border-left: 3px solid var(--danger);
     padding: 10px;
+    border-radius: 0 4px 4px 0;
+    margin: 10px 0;
+    animation: pulseAlert 1.5s infinite;
+}
+
+@keyframes pulseAlert {
+    0% { opacity: 1; }
+    50% { opacity: 0.9; }
+    100% { opacity: 1; }
+}
+
+.urgent-alert h5 {
+    color: var(--danger);
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Footer with improved input */
+.chat-box-footer {
+    padding: 12px 15px;
     background: white;
     border-top: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-container {
+    flex: 1;
+    position: relative;
     display: flex;
     align-items: center;
 }
 
 .chat-box-footer input {
     flex: 1;
-    padding: 10px 15px;
+    padding: 12px 15px;
+    padding-right: 35px;
     border: 1px solid #ddd;
-    border-radius: 20px;
+    border-radius: 25px;
     outline: none;
-    font-family: 'Raleway', sans-serif;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    transition: all 0.2s;
+    background: #f8f9fa;
+}
+
+.chat-box-footer input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(44, 80, 239, 0.2);
+}
+
+#voiceBtn {
+    position: absolute;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    font-size: 14px;
 }
 
 .chat-box-footer button {
     background: transparent;
     border: none;
-    padding: 0 10px;
+    padding: 0;
     cursor: pointer;
-    color: #2C50EF;
+    color: var(--primary);
     font-size: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
 }
 
-/* Chat Button */
+.chat-box-footer button:hover {
+    background: rgba(44, 80, 239, 0.1);
+}
+
+#sendButton {
+    background: var(--primary);
+    color: white;
+}
+
+#sendButton:hover {
+    background: var(--primary-dark);
+}
+
+/* Chat Button - More prominent */
 .chat-button {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #2C50EF;
+    bottom: 30px;
+    right: 30px;
+    background: var(--primary);
     width: 60px;
     height: 60px;
     border-radius: 50%;
@@ -156,15 +395,38 @@ body {
     align-items: center;
     color: white;
     cursor: pointer;
-    box-shadow: 0 5px 15px rgba(44, 80, 239, 0.3);
+    box-shadow: 0 10px 25px rgba(44, 80, 239, 0.3);
     z-index: 1001;
+    transition: all 0.3s;
+}
+
+.chat-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 30px rgba(44, 80, 239, 0.4);
 }
 
 .chat-button i {
     font-size: 24px;
 }
 
-/* Modal */
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--danger);
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    animation: pulse 1.5s infinite;
+}
+
+/* Modal - More modern and organized */
 .modal {
     position: fixed;
     top: 0;
@@ -179,6 +441,7 @@ body {
     visibility: hidden;
     transition: all 0.3s ease;
     z-index: 2000;
+    backdrop-filter: blur(3px);
 }
 
 .modal.active {
@@ -188,11 +451,18 @@ body {
 
 .modal-content {
     background: white;
-    border-radius: 10px;
+    border-radius: 16px;
     width: 90%;
-    max-width: 400px;
-    padding: 20px;
+    max-width: 420px;
+    padding: 25px;
     position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.modal.active .modal-content {
+    transform: translateY(0);
 }
 
 .modal-close-button {
@@ -201,37 +471,218 @@ body {
     right: 15px;
     font-size: 20px;
     cursor: pointer;
-    color: #888;
+    color: var(--text-light);
+    transition: color 0.2s;
+}
+
+.modal-close-button:hover {
+    color: var(--text);
+}
+
+.modal h3 {
+    color: var(--primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+}
+
+.modal h3 i {
+    font-size: 20px;
 }
 
 .modal-options {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
+    gap: 12px;
+    margin-top: 15px;
 }
 
 .modal-btn {
-    padding: 12px;
-    border-radius: 8px;
+    padding: 15px;
+    border-radius: 12px;
     border: none;
-    background: #f0f2f5;
+    background: #f8f9fa;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    text-align: left;
+    width: 100%;
 }
 
 .modal-btn:hover {
-    background: #e0e2e5;
+    background: #eef2f7;
+    transform: translateX(3px);
 }
 
-/* Responsive */
-@media (max-width: 480px) {
-    .chat-box {
+.modal-btn i {
+    font-size: 20px;
+    color: var(--primary);
+    width: 24px;
+    text-align: center;
+}
+
+.modal-btn div {
+    flex: 1;
+}
+
+.modal-btn strong {
+    display: block;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 3px;
+}
+
+.modal-btn small {
+    display: block;
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.modal-footer {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    font-size: 12px;
+    color: var(--text-light);
+    text-align: center;
+}
+
+.modal-footer strong {
+    color: var(--danger);
+}
+
+/* Emergency Modal */
+.emergency-content {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    padding: 25px;
+    text-align: center;
+}
+
+.emergency-content h3 {
+    color: var(--danger);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.emergency-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.emergency-btn {
+    padding: 15px;
+    border-radius: 8px;
+    border: none;
+    background: #FDE8E8;
+    color: var(--danger);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.emergency-btn:hover {
+    background: #FBD5D5;
+}
+
+.emergency-btn i {
+    font-size: 18px;
+}
+
+.emergency-symptoms {
+    text-align: left;
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.emergency-symptoms h4 {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: var(--danger);
+}
+
+.emergency-symptoms ul {
+    list-style: none;
+    padding-left: 5px;
+}
+
+.emergency-symptoms li {
+    margin-bottom: 8px;
+    font-size: 13px;
+    position: relative;
+    padding-left: 20px;
+}
+
+.emergency-symptoms li:before {
+    content: "•";
+    color: var(--danger);
+    font-size: 20px;
+    position: absolute;
+    left: 0;
+    top: -3px;
+}
+
+.close-emergency {
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+.close-emergency:hover {
+    color: var(--text);
+}
+
+/* Print specific styles */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .print-summary, .print-summary * {
+        visibility: visible;
+    }
+    .print-summary {
+        position: absolute;
+        left: 0;
+        top: 0;
         width: 100%;
-        height: 100%;
+        padding: 20px;
+    }
+    .no-print {
+        display: none;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .chat-container {
+        bottom: 15px;
+        right: 15px;
+    }
+    
+    .chat-box {
+        width: 100vw;
+        height: 100vh;
         border-radius: 0;
         position: fixed;
         top: 0;
@@ -239,26 +690,128 @@ body {
     }
     
     .chat-button {
-        bottom: 15px;
-        right: 15px;
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 20px 15px;
     }
 }
 
-/* Add this to your existing CSS */
-.chat-box-body-receive i {
-    color: #666;
-    font-style: italic;
+/* Animations */
+@keyframes slideInRight {
+    from { transform: translateX(20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInLeft {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Disease-specific message formatting */
+.disease-symptoms {
+    border-left: 3px solid var(--sa-green);
+    padding-left: 10px;
+    margin: 10px 0;
+}
+
+.disease-treatment {
+    border-left: 3px solid var(--sa-blue);
+    padding-left: 10px;
+    margin: 10px 0;
+}
+
+.disease-prevention {
+    border-left: 3px solid var(--sa-yellow);
+    padding-left: 10px;
+    margin: 10px 0;
+}
+
+.disease-urgent {
+    border-left: 3px solid var(--sa-red);
+    padding-left: 10px;
+    margin: 10px 0;
+    animation: pulse 1.5s infinite;
+}
+
+.clinic-card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    border-left: 4px solid var(--primary);
+}
+
+.clinic-name {
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 5px;
+}
+
+.clinic-address {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-bottom: 8px;
+}
+
+.clinic-hours {
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-light);
+    margin-bottom: 8px;
+}
+
+.clinic-phone {
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--primary);
 }
 
 /* Loading dots animation */
-.typing-dots::after {
-    content: '.';
-    animation: dots 1.5s steps(5, end) infinite;
+.typing-indicator {
+    display: flex;
+    padding: 10px 15px;
+    background: white;
+    border-radius: 18px;
+    width: fit-content;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    float: left;
+    border-bottom-left-radius: 4px;
 }
 
-@keyframes dots {
-    0%, 20% { content: '.'; }
-    40% { content: '..'; }
-    60% { content: '...'; }
-    80%, 100% { content: ''; }
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background: #ccc;
+    border-radius: 50%;
+    margin: 0 2px;
+    animation: typingAnimation 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typingAnimation {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
 }
