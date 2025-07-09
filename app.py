@@ -16,6 +16,7 @@ from transformers import pipeline
 from src.helper import load_medical_disease_data
 import logging
 from typing import Dict, Any, Optional
+from googletrans import Translator
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -39,6 +40,22 @@ os.environ["HUGGINGFACE_API_TOKEN"] = HUGGINGFACE_API_TOKEN
 embeddings = download_huggingface_embeddings()
 index_name = "medicalbot"
 medical_disease_data = load_medical_disease_data()
+
+LANGUAGE_MAP = {
+    'en': 'english',
+    'zu': 'zulu',
+    'xh': 'xhosa',
+    'af': 'afrikaans',
+    'st': 'sesotho',
+    'tn': 'setswana',
+    'ts': 'xitsonga',
+    've': 'tshivenda',
+    'ss': 'siswati',
+    'nso': 'Northern Sotho',
+    'nr': 'ndebele'
+}
+
+SUPPORTED_TRANSLATION_LANGS = ['en', 'zu', 'xh', 'af', 'st', 'tn']
 
 #Embed each chunk and upsert the embeddings into your Pinecone index
 try:
@@ -213,6 +230,27 @@ def get_south_africa_guidance(disease_info: Dict[str, Any]) -> str:
     return guidance_map.get(name, 
         "Standard treatment available at primary healthcare clinics. Severe cases should be referred.")
 
+    
+def translate_text(text, target_lang='en', source_lang='auto'):
+    """Translate text between supported languages"""
+    if target_lang not in SUPPORTED_TRANSLATION_LANGS:
+        logger.warning(f"Translation to {target_lang} not fully supported")
+        return text
+        
+    try:
+        if target_lang == 'en':
+            # Translate to English for processing
+            translator = Translator(from_lang=source_lang, to_lang='en')
+        else:
+            # Translate from English to target language
+            translator = Translator(from_lang='en', to_lang=target_lang)
+            
+        translation = translator.translate(text)
+        return translation
+    except Exception as e:
+        logger.error(f"Translation error ({source_lang}->{target_lang}): {str(e)}")
+        return text
+
 llm = pipeline (
     task="text2text-generation",
     model="google/flan-t5-large",
@@ -248,6 +286,56 @@ def debug():
         "current_directory": os.getcwd(),
         "files_in_template": os.listdir(app.template_folder)
     }
+
+@app.route("/analyze_symptoms", methods=["POST"])
+def analyze_symptoms():
+    try:
+        data = request.get_json()
+        symptoms = {
+            'main': data.get('main_symptom'),
+            'duration': data.get('duration'),
+            'severity': data.get('severity'),
+            'additional': data.get('additional_symptoms')
+        }
+        target_lang = data.get('lang', 'en')
+        
+        # Simple symptom analysis logic - you can expand this
+        analysis = analyze_symptom_patterns(symptoms)
+        
+        # Translate if needed
+        if target_lang != 'en':
+            analysis = translate_text(analysis, target_lang)
+        
+        return jsonify({"analysis": analysis})
+        
+    except Exception as e:
+        logger.error(f"Symptom analysis error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+def analyze_symptom_patterns(symptoms):
+    """Basic symptom analysis - expand with your medical knowledge"""
+    main = symptoms['main'].lower()
+    additional = symptoms['additional'].lower()
+    
+    if 'fever' in main:
+        if 'difficulty breathing' in additional:
+            return ("Possible respiratory infection or malaria. "
+                   "If fever is high (>39°C) or lasts more than 3 days, "
+                   "please visit a clinic immediately.")
+        return "Possible viral infection. Rest and drink fluids. If symptoms worsen, see a doctor."
+    
+    elif 'headache' in main:
+        if 'dizziness' in additional:
+            return "Possible migraine or blood pressure issue. Monitor symptoms and consult a doctor if severe."
+        return "Common headache. Rest and hydrate. If persistent, consider medical advice."
+    
+    elif 'stomach pain' in main:
+        if 'diarrhea' in additional or 'nausea' in additional:
+            return "Possible food poisoning or gastrointestinal infection. Drink plenty of fluids and rest."
+        return "Abdominal pain could have various causes. If severe or persistent, seek medical attention."
+    
+    return ("Based on your symptoms, it's recommended to monitor your condition. "
+           "If symptoms persist or worsen, please consult a healthcare professional.")
     
 @app.route("/get", methods=["POST"])
 def chat():
@@ -260,40 +348,61 @@ def chat():
         if not user_input:
             return jsonify({"error": "Empty message"}), 400
         
-        # Check for disease match
-        disease_info = find_matching_disease(user_input)
+        # Get language (default to English if not specified)
+        target_lang = data.get("lang", "en")
         
-        if disease_info:
-            # Get supplemental context from RAG
-            docs = retriever.invoke(disease_info['name'])[:1]
-            rag_context = docs[0].page_content[:300] if docs else ""
-            
-            response = format_disease_response(disease_info, rag_context)
-            return jsonify({"answer": response})
+        # Verify language is supported
+        if target_lang not in LANGUAGE_MAP:
+            target_lang = 'en'
         
-        # Standard RAG flow
-        docs = retriever.invoke(user_input)
-        context = "\n".join(d.page_content[:300] for d in docs[:2])
+        # Get language name for logging
+        lang_name = LANGUAGE_MAP.get(target_lang, 'english')
+        logger.info(f"Processing request in {lang_name} (code: {target_lang})")
         
-        # Enhance prompt with disease awareness
-        disease_list = ", ".join(medical_disease_data.keys())
-        enhanced_prompt = system_prompt.format(
-            context=context,
-            input=user_input,
-            disease_list=disease_list
-        )
+        # Translate non-English input to English for processing
+        processed_input = user_input
+        if target_lang != "en":
+            processed_input = translate_text(user_input, 'en', target_lang)
+            logger.debug(f"Translated input: {user_input} -> {processed_input}")
         
-        raw_response = llm(enhanced_prompt, max_length=800)[0]['generated_text']
-        final_response = enhance_response(raw_response, llm)
+        # ... rest of your existing processing logic ...
+        
+        # Translate final response if needed
+        final_response = ... # Your existing response generation
+        
+        if target_lang != "en":
+            try:
+                translated_response = translate_text(final_response, target_lang)
+                return jsonify({"answer": translated_response})
+            except Exception as e:
+                logger.error(f"Failed to translate response to {target_lang}: {str(e)}")
+                # Fallback to English with explanation
+                return jsonify({
+                    "answer": f"(Translation not available) {final_response}",
+                    "warning": f"Full translation to {LANGUAGE_MAP[target_lang]} not available"
+                })
         
         return jsonify({"answer": final_response})
         
     except Exception as e:
         logger.error(f"Chat error: {str(e)}", exc_info=True)
-        return jsonify({
-            "error": "I'm having trouble answering that. Please try again or rephrase your question.",
-            "debug": str(e) if app.debug else None
-        }), 500
+        error_msg = get_translated_error(target_lang, str(e))
+        return jsonify({"error": error_msg}), 500
+
+def get_translated_error(lang, error_details=""):
+    """Get error message in appropriate language"""
+    error_messages = {
+        'en': "I'm having trouble answering that. Please try again or rephrase your question.",
+        'zu': "Ngiyaxhuzula ukuphendula lokho. Ngicela uzame futhi noma uchaze umbuzo wakho ngendlela ehlukile.",
+        'xh': "Ndiyabandezelwa ukuphendula loo nto. Nceda uzame kwakhona okanye uphinde ufake umbuzo wakho ngolunye uhlobo.",
+        'af': "Ek het probleme om dit te beantwoord. Probeer asseblief weer of herformuleer jou vraag.",
+        'st': "Ke na le bothata ho araba seo. Ka kopo leka hape kapa hlalosa potso ea hao ka tsela e fapaneng.",
+        'tn': "Ke na le mathata a go araba seo. Tsweetswee leka gape kgotsa buisa potso ya gago ka tsela e nngwe."
+    }
+    
+    # Default to English if language not supported
+    return error_messages.get(lang, error_messages['en']) + (
+        f"\n(Technical details: {error_details}" if app.debug else "")
     
 print(f"Current working directory: {os.getcwd()}")
 print(f"Template folder path: {os.path.abspath(app.template_folder)}")

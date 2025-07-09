@@ -815,3 +815,101 @@ body {
     0%, 60%, 100% { transform: translateY(0); }
     30% { transform: translateY(-5px); }
 }
+
+/* Add to your CSS file */
+.language-selector {
+    margin-left: auto;
+    margin-right: 15px;
+}
+
+.language-selector select {
+    padding: 5px 10px;
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.2);
+    color: white;
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+}
+
+.language-selector select option {
+    color: #333;
+}
+
+#symptomSteps {
+    min-height: 200px;
+    padding: 15px 0;
+}
+
+.symptom-step {
+    display: none;
+}
+
+.symptom-step.active {
+    display: block;
+}
+
+.symptom-question {
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.symptom-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.symptom-option {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.symptom-option:hover {
+    background: #f0f2f5;
+    border-color: var(--primary);
+}
+
+.symptom-option.selected {
+    background: rgba(44, 80, 239, 0.1);
+    border-color: var(--primary);
+}
+
+.symptom-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.symptom-nav button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+}
+
+.symptom-nav button:disabled {
+    background: #ddd;
+    cursor: not-allowed;
+}
+
+.symptom-progress {
+    height: 5px;
+    background: #eee;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+
+.symptom-progress-bar {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 5px;
+    width: 0%;
+    transition: width 0.3s;
+}

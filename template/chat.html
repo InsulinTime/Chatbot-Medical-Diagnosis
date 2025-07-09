@@ -5,12 +5,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EDI - South African Medical Assistant</title>
+    <title>EDI - Medical Assistant</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
+<div class="language-selector">
+    <select id="languageSelect">
+        <option value="en">English</option>
+        <option value="zu">Zulu</option>
+        <option value="xh">Xhosa</option>
+        <option value="af">Afrikaans</option>
+        <option value="st">Sesotho</option>
+        <option value="tn">Setswana</option>
+        <option value="ts">Xitsonga</option>
+        <option value="ve">Tshivenda</option>
+        <option value="ss">Swati</option>
+        <option value="nso">Northern Sotho</option>
+        <option value="nr">Southern Ndebele</option>
+    </select>
+</div>
 <body>
     <div class="chat-container">
         <!-- Chat Box -->
@@ -65,13 +80,11 @@
             </div>
         </div>
         
-        <!-- Chat Toggle Button -->
         <div class="chat-button animate__animated animate__bounceIn" id="chatButton">
             <i class="fas fa-comment-medical"></i>
             <span class="notification-badge">1</span>
         </div>
         
-        <!-- Modal for additional options -->
         <div class="modal" id="optionsModal">
             <div class="modal-content animate__animated animate__fadeInUp">
                 <span class="modal-close-button">&times;</span>
@@ -121,7 +134,6 @@
         </div>
     </div>
 
-    <!-- Add this modal for emergency situations -->
     <div class="modal" id="emergencyModal">
         <div class="modal-content emergency-content animate__animated animate__headShake">
             <h3><i class="fas fa-exclamation-triangle"></i> Emergency Assistance</h3>
@@ -147,6 +159,22 @@
                 </ul>
             </div>
             <button class="close-emergency" id="closeEmergency">Cancel</button>
+        </div>
+    </div>
+
+    <div class="modal" id="symptomCheckerModal">
+        <div class="modal-content">
+            <span class="modal-close-button">&times;</span>
+            <h3><i class="fas fa-stethoscope"></i> Symptom Checker</h3>
+            
+            <div id="symptomSteps">
+                <!-- Steps will be injected here by JavaScript -->
+            </div>
+            
+            <div class="symptom-nav">
+                <button id="prevSymptom" disabled>Previous</button>
+                <button id="nextSymptom">Next</button>
+            </div>
         </div>
     </div>
 
