@@ -57,7 +57,6 @@ LANGUAGE_MAP = {
 
 SUPPORTED_TRANSLATION_LANGS = ['en', 'zu', 'xh', 'af', 'st', 'tn']
 
-#Embed each chunk and upsert the embeddings into your Pinecone index
 try:
     docsearch = PineconeVectorStore.from_existing_index(
         index_name=index_name,
@@ -238,18 +237,26 @@ def translate_text(text, target_lang='en', source_lang='auto'):
         return text
         
     try:
-        if target_lang == 'en':
-            # Translate to English for processing
-            translator = Translator(from_lang=source_lang, to_lang='en')
-        else:
-            # Translate from English to target language
-            translator = Translator(from_lang='en', to_lang=target_lang)
-            
+        translator = Translator(to_lang=target_lang, from_lang=source_lang)
         translation = translator.translate(text)
         return translation
     except Exception as e:
         logger.error(f"Translation error ({source_lang}->{target_lang}): {str(e)}")
         return text
+    
+def get_translated_error(lang, error_details=""):
+    """Get error message in appropriate language"""
+    error_messages = {
+        'en': "I'm having trouble answering that. Please try again or rephrase your question.",
+        'zu': "Ngiyaxhuzula ukuphendula lokho. Ngicela uzame futhi noma uchaze umbuzo wakho ngendlela ehlukile.",
+        'xh': "Ndiyabandezelwa ukuphendula loo nto. Nceda uzame kwakhona okanye uphinde ufake umbuzo wakho ngolunye uhlobo.",
+        'af': "Ek het probleme om dit te beantwoord. Probeer asseblief weer of herformuleer jou vraag.",
+        'st': "Ke na le bothata ho araba seo. Ka kopo leka hape kapa hlalosa potso ea hao ka tsela e fapaneng.",
+        'tn': "Ke na le mathata a go araba seo. Tsweetswee leka gape kgotsa buisa potso ya gago ka tsela e nngwe."
+    }
+    return error_messages.get(lang, error_messages['en']) + (
+        f"\n(Technical details: {error_details}" if app.debug else "")
+
 
 llm = pipeline (
     task="text2text-generation",
@@ -299,10 +306,8 @@ def analyze_symptoms():
         }
         target_lang = data.get('lang', 'en')
         
-        # Simple symptom analysis logic - you can expand this
         analysis = analyze_symptom_patterns(symptoms)
         
-        # Translate if needed
         if target_lang != 'en':
             analysis = translate_text(analysis, target_lang)
         
@@ -365,11 +370,49 @@ def chat():
             processed_input = translate_text(user_input, 'en', target_lang)
             logger.debug(f"Translated input: {user_input} -> {processed_input}")
         
-        # ... rest of your existing processing logic ...
+        # Check for disease match
+        disease_info = find_matching_disease(processed_input)
+        
+        if disease_info:
+            # Get supplemental context from RAG
+            docs = retriever.invoke(disease_info['name'])[:1]
+            rag_context = docs[0].page_content[:300] if docs else ""
+            
+            # Format the disease response in English first
+            english_response = format_disease_response(disease_info, rag_context)
+            
+            # Translate if needed
+            if target_lang != "en":
+                try:
+                    translated_response = translate_text(english_response, target_lang)
+                    return jsonify({"answer": translated_response})
+                except Exception as e:
+                    logger.error(f"Response translation error: {str(e)}")
+                    # Fallback to English with explanation
+                    return jsonify({
+                        "answer": f"(Translation not available) {english_response}",
+                        "warning": f"Full translation to {LANGUAGE_MAP[target_lang]} not available"
+                    })
+            
+            return jsonify({"answer": english_response})
+        
+        # Standard RAG flow - process in English
+        docs = retriever.invoke(processed_input)
+        context = "\n".join(d.page_content[:300] for d in docs[:2])
+        
+        # Enhance prompt with disease awareness
+        disease_list = ", ".join(medical_disease_data.keys())
+        enhanced_prompt = system_prompt.format(
+            context=context,
+            input=processed_input,
+            disease_list=disease_list
+        )
+        
+        # Get response from LLM in English
+        raw_response = llm(enhanced_prompt, max_length=800)[0]['generated_text']
+        final_response = enhance_response(raw_response, llm)
         
         # Translate final response if needed
-        final_response = ... # Your existing response generation
-        
         if target_lang != "en":
             try:
                 translated_response = translate_text(final_response, target_lang)
