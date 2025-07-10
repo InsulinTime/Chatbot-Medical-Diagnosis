@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, session
 from src.helper import download_huggingface_embeddings
 from langchain_pinecone import PineconeVectorStore
 from dotenv import load_dotenv
@@ -15,8 +15,9 @@ from store_index import *
 from transformers import pipeline 
 from src.helper import load_medical_disease_data
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from googletrans import Translator
+from datetime import timedelta
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -229,20 +230,41 @@ def get_south_africa_guidance(disease_info: Dict[str, Any]) -> str:
     return guidance_map.get(name, 
         "Standard treatment available at primary healthcare clinics. Severe cases should be referred.")
 
+def clean_response(response):
+    """Remove auto-generated boilerplate from responses"""
+    unwanted_phrases = [
+        "Improve the medical response for rural South African clinics:",
+        "Rural clinic response:"
+    ]
+    for phrase in unwanted_phrases:
+        response = response.replace(phrase, "")
+    return response.strip()
     
-def translate_text(text, target_lang='en', source_lang='auto'):
-    """Translate text between supported languages"""
-    if target_lang not in SUPPORTED_TRANSLATION_LANGS:
-        logger.warning(f"Translation to {target_lang} not fully supported")
+def translate_text(text, target_lang='en'):
+    if target_lang == 'en':
         return text
         
     try:
-        translator = Translator(to_lang=target_lang, from_lang=source_lang)
-        translation = translator.translate(text)
-        return translation
+        clean_text = clean_response(text)
+        
+        medical_phrases = {
+            'en': "HIV symptoms include",
+            'af': "MIV simptome sluit in",
+            'zu': "Izimpawu ze-HIV zihlanganisa",
+            'xh': "Iimpawu ze-HIV ziquka",
+            'tn': "Matlhago a HIV a akaretsa"
+        }
+        
+        for en_phrase, trans_phrase in medical_phrases.items():
+            if en_phrase in clean_text:
+                return clean_text.replace(en_phrase, trans_phrase)
+                
+        translator = Translator(to_lang=target_lang)
+        translated = translator.translate(clean_text)
+        return translated
     except Exception as e:
-        logger.error(f"Translation error ({source_lang}->{target_lang}): {str(e)}")
-        return text
+        logger.error(f"Translation failed: {str(e)}")
+        return f"{clean_text}\n(Translation unavailable in {target_lang})"
     
 def get_translated_error(lang, error_details=""):
     """Get error message in appropriate language"""
@@ -273,6 +295,22 @@ prompt = ChatPromptTemplate.from_messages(
         ("system", system_prompt),
         ("human", "{input}"),
     ])
+
+def generate_followups(patient_input: str, chat_history: List[str]) -> str:
+    """Generate clinical follow-up questions based on conversation"""
+    prompt = f"""As a clinician, what are 5 most important follow-up questions for:
+Patient: {patient_input}
+History: {chat_history[-2:] if chat_history else "None"}
+
+Respond in this format:
+1. [Priority 1 question]
+2. [Priority 2 question]
+3. [Priority 3 question]
+4. [Priority 4 question]
+5. [Priority 5 question]"""
+    
+    questions = llm(prompt, max_length=200)[0]['generated_text']
+    return [q.split(".")[1].strip() for q in questions.split("\n") if q]
 
 question_answer_chain = create_stuff_documents_chain(llm, prompt)
 rag_chain = create_retrieval_chain(retriever, question_answer_chain)
@@ -353,42 +391,33 @@ def chat():
         if not user_input:
             return jsonify({"error": "Empty message"}), 400
         
-        # Get language (default to English if not specified)
         target_lang = data.get("lang", "en")
         
-        # Verify language is supported
         if target_lang not in LANGUAGE_MAP:
             target_lang = 'en'
         
-        # Get language name for logging
         lang_name = LANGUAGE_MAP.get(target_lang, 'english')
         logger.info(f"Processing request in {lang_name} (code: {target_lang})")
         
-        # Translate non-English input to English for processing
         processed_input = user_input
         if target_lang != "en":
             processed_input = translate_text(user_input, 'en', target_lang)
             logger.debug(f"Translated input: {user_input} -> {processed_input}")
         
-        # Check for disease match
         disease_info = find_matching_disease(processed_input)
         
         if disease_info:
-            # Get supplemental context from RAG
             docs = retriever.invoke(disease_info['name'])[:1]
             rag_context = docs[0].page_content[:300] if docs else ""
             
-            # Format the disease response in English first
             english_response = format_disease_response(disease_info, rag_context)
             
-            # Translate if needed
             if target_lang != "en":
                 try:
                     translated_response = translate_text(english_response, target_lang)
                     return jsonify({"answer": translated_response})
                 except Exception as e:
                     logger.error(f"Response translation error: {str(e)}")
-                    # Fallback to English with explanation
                     return jsonify({
                         "answer": f"(Translation not available) {english_response}",
                         "warning": f"Full translation to {LANGUAGE_MAP[target_lang]} not available"
@@ -396,11 +425,18 @@ def chat():
             
             return jsonify({"answer": english_response})
         
-        # Standard RAG flow - process in English
+        else:
+            followups = generate_followups(processed_input, session.get('chat_history', []))
+            
+            if should_ask_followup(processed_input):
+                return jsonify({
+                    "action": "ask_followup",
+                    "questions": followups[:2]
+                })
+        
         docs = retriever.invoke(processed_input)
         context = "\n".join(d.page_content[:300] for d in docs[:2])
         
-        # Enhance prompt with disease awareness
         disease_list = ", ".join(medical_disease_data.keys())
         enhanced_prompt = system_prompt.format(
             context=context,
@@ -408,18 +444,15 @@ def chat():
             disease_list=disease_list
         )
         
-        # Get response from LLM in English
         raw_response = llm(enhanced_prompt, max_length=800)[0]['generated_text']
         final_response = enhance_response(raw_response, llm)
         
-        # Translate final response if needed
         if target_lang != "en":
             try:
                 translated_response = translate_text(final_response, target_lang)
                 return jsonify({"answer": translated_response})
             except Exception as e:
                 logger.error(f"Failed to translate response to {target_lang}: {str(e)}")
-                # Fallback to English with explanation
                 return jsonify({
                     "answer": f"(Translation not available) {final_response}",
                     "warning": f"Full translation to {LANGUAGE_MAP[target_lang]} not available"
@@ -431,6 +464,14 @@ def chat():
         logger.error(f"Chat error: {str(e)}", exc_info=True)
         error_msg = get_translated_error(target_lang, str(e))
         return jsonify({"error": error_msg}), 500
+    
+def should_ask_followup(text: str) -> bool:
+    """Determine if the input seems like incomplete symptoms"""
+    indicators = [
+        "i have", "i feel", "i'm experiencing",
+        "ndine", "ngizizwa", "ke na le"
+    ]
+    return any(indicator in text.lower() for indicator in indicators)
 
 def get_translated_error(lang, error_details=""):
     """Get error message in appropriate language"""
