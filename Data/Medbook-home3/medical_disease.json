@@ -1899,6 +1899,355 @@
 	        "Malnutrition, encompassing both undernutrition and overnutrition, remains a significant public health challenge in South Africa, affecting many children and adults. While the country faces a complex dual burden of malnutrition, with issues like stunting alongside rising rates of overweight and obesity, the consequences of undernutrition, including child deaths and developmental delays, are particularly concerning."
         ],
         "summary":"Malnutrition, in general, refers to a state of imbalance in nutrient intake, either through deficiencies, excesses, or imbalances in energy, macronutrients, or micronutrients. It encompasses undernutrition (including wasting, stunting, and underweight) and overnutrition (including overweight, obesity, and diet-related diseases). Malnutrition can have significant adverse effects on body structure, function, and clinical outcomes."
+    },
+    {
+        "name": "Yellow Fever",
+        "description": "Yellow fever is a viral disease transmitted by infected mosquitoes, primarily in tropical and subtropical areas of Africa and South America. It can range from mild, flu-like symptoms to severe illness, including jaundice (yellowing of the skin and eyes), bleeding, and organ failure. The yellow fever virus is an arbovirus, belonging to the flavivirus genus, and is carried by Aedes and Haemagogus mosquitoes.",
+        "symptoms":[
+            "Fever: A sudden onset of fever is a common early symptom.",
+            "Muscle pain: Backache and generalized muscle aches are also frequently reported.",
+            "Headache: Headaches, often severe, can accompany the fever and muscle pain.",
+            "Chills: Shaking chills can occur with the fever.",
+            "Loss of appetite: Reduced appetite and nausea are also common.",
+            "Vomiting: Nausea and vomiting can be present, sometimes with abdominal pain.",
+            "Fatigue and weakness: Feeling tired and weak is also a common experience.",
+            "Jaundice: Yellowing of the skin and eyes (jaundice) is a key sign of severe yellow fever, indicating liver involvement.",
+            "Bleeding: Bleeding can occur from various sites, including the nose, mouth, eyes, and stomach, and may be visible in vomit or stool.",
+            "Kidney and liver problems: Severe cases can lead to kidney and liver dysfunction, potentially causing serious complications.",
+            "Organ failure: In the most severe cases, organ failure can occur, leading to death.",
+            "Shock: Low blood pressure and shock can also be present in severe cases."
+        ],
+        "how_contracted":[
+            "Mosquito bites: The primary mode of transmission is through the bite of infected mosquitoes, particularly Aedes aegypti and Haemagogus species.",
+            "Human-to-mosquito transmission: Infected humans can transmit the virus to mosquitoes, which can then spread it to other humans.",
+            "Monkey-to-mosquito transmission: In some cases, the virus can also be transmitted from infected monkeys to mosquitoes, which can then infect humans.",
+            "Travel to endemic areas: People who travel to areas where yellow fever is common are at risk of contracting the disease if they are bitten by infected mosquitoes."
+        ],
+        "diagnosis":[
+            "Molecular Testing: Polymerase chain reaction (PCR) can detect the yellow fever virus in blood samples during the early, viraemic phase (first 3-4 days). This is a highly specific method, especially when using appropriate controls.",
+            "ELISA (enzyme-linked immunosorbent assay) and PRNT (plaque-reduction neutralization test) detect yellow fever virus-specific antibodies in the blood.",
+            "Serological testing can also help differentiate between antibodies produced by vaccination and those from wild-type virus infection."
+        ],
+        "treatment":[
+            "Supportive care: There is no specific antiviral treatment for yellow fever, so management focuses on supportive care to relieve symptoms and prevent complications.",
+            "Hydration: Maintaining hydration is crucial, especially in cases of fever and vomiting.",
+            "Rest: Rest is crucial for recovery.",
+            "Avoid aspirin and non-steroidal anti-inflammatory drugs (NSAIDs): These should be avoided as they can increase the risk of bleeding, especially in severe cases.",
+            "Hospitalization: Severe cases may require hospitalization for close monitoring and management of complications."
+        ],
+        "prevention":[
+            "Vaccination: The most effective way to prevent yellow fever is through vaccination. The yellow fever vaccine is safe and provides long-lasting immunity, typically for at least 10 years.",
+            "Avoiding mosquito bites: Use insect repellent, wear long sleeves and pants, and use mosquito nets when sleeping in areas where yellow fever is common.",
+            "Environmental control: Reducing mosquito breeding sites by eliminating standing water and using insecticides can help control mosquito populations.",
+            "Travel precautions: If traveling to areas where yellow fever is endemic, ensure you are vaccinated and take precautions to avoid mosquito bites."
+        ],
+        "high_risk_areas":[
+            "Yellow fever is endemic in tropical and subtropical regions of Africa and South America. In Africa, it is primarily found in countries like Angola, the Democratic Republic of the Congo, Nigeria, and Uganda. In South America, countries such as Brazil, Colombia, Peru, and Venezuela are at risk.",
+            "Angola, Benin, Burkina Faso, Burundi, Cameroon, Central African Republic, Chad, Congo, Côte d'Ivoire, Democratic Republic of Congo, Equatorial Guinea, Ethiopia, Gabon, Gambia, Ghana, Guinea, Guinea-Bissau, Kenya, Liberia, Mali, Mauritania, Niger, Nigeria, Rwanda, Senegal, Sierra Leone, Sudan, Togo, and Uganda.",
+            "Brazil, Columbia, Argentina, Paraguay, French Guiana, Guyana, Suriname, Venezuela, Peru, Bolivia, and Ecuador."
+        ],
+        "summary": "Yellow fever is a viral disease transmitted by mosquitoes, found in tropical and subtropical areas of Africa and South America. It's characterized by fever, muscle pain, headache, and in severe cases, jaundice, bleeding, and organ failure. The disease can be prevented with a vaccine, and travellers to affected regions are advised to get vaccinated. The disease is found in tropical and subtropical regions of Africa and South America."
+    },
+    {
+        "name": "Ebola Virus",
+        "description": "Ebola virus disease (EVD), formerly known as Ebola hemorrhagic fever, is a severe and often fatal illness in humans caused by Ebola viruses. It's characterized by symptoms like fever, headache, muscle and joint pain, and can progress to more severe symptoms including bleeding, organ failure, and potentially death.",
+        "symptoms":[
+            "Fever: Often over 38.3°C (101°F).",
+            "Fatigue and Weakness: Intense feeling of tiredness.",
+            "Muscle and Joint Pain: Aches and pains throughout the body.",
+            "Headache: Severe headache.",
+            "Sore Throat: Irritation or pain in the throat.",
+            "Vomiting and Diarrhoea: Can be severe and lead to dehydration.",
+            "Rash: Skin rash may develop.",
+            "Impaired Kidney and Liver Function: Can lead to organ failure.",
+            "Internal and External Bleeding: In some cases, bleeding from the gums, nose, or other areas."
+        ],
+        "how_contracted":[
+            "With infected humans: Ebola is spread through direct contact with the blood, body fluids, or tissues of an infected person who is symptomatic or has died from the disease.",
+            "With infected animals: Humans can also contract Ebola by handling or consuming infected animals, such as fruit bats, chimpanzees, gorillas, monkeys, forest antelope, or porcupines.",
+            "From contaminated objects: Objects like needles, bedding, and medical equipment that have been contaminated with bodily fluids from an infected person can transmit the virus.",
+            "During burial ceremonies: Direct contact with the body of someone who has died from Ebola can also lead to transmission.",
+            "Sexual transmission: Ebola can be transmitted sexually for some time after recovery, even if the individual is no longer showing symptoms.",
+            "Mother-to-child transmission: Ebola can be passed from a mother to her child during pregnancy, childbirth, or through breast milk."
+        ],
+        "diagnosis":[
+            "Sample Collection: Samples like whole blood or plasma are collected from living patients, while oral swabs are used for deceased individuals.",
+            "NAATs (PCR): Nucleic acid amplification tests (NAATs), such as PCR, are the gold standard for detecting the virus's genetic material.",
+            "Other Tests: Serological assays to detect Ebola antibodies and protein antigen detection assays may also be used.",
+            "Biosafety: Laboratory handling of Ebola samples requires strict biosafety measures due to the high risk of infection.",
+            "Confirmation: If initial tests are negative, but suspicion remains high, repeat testing with samples taken after 72 hours of symptom onset may be necessary."
+        ],
+        "treatment":[
+            "Supportive care: This includes maintaining hydration, electrolyte balance, and managing symptoms like fever and pain.",
+            "Experimental treatments: Several experimental treatments have been used, including monoclonal antibodies (like Inmazeb and Ebanga), antiviral drugs (like remdesivir), and convalescent plasma therapy.",
+            "Vaccination: The rVSV-ZEBOV vaccine has been shown to be effective in preventing Ebola virus disease in outbreak settings.",
+            "Preventive measures: Isolation of infected individuals, contact tracing, and community engagement are crucial in controlling outbreaks."
+        ],
+        "prevention":[
+            "Ebola prevention focuses on avoiding contact with bodily fluids of infected individuals or animals, practicing strict hygiene, and using personal protective equipment (PPE) when in contact with potentially infected materials. Vaccination with ERVEBO is also an important preventative measure against the Zaire ebolavirus.",
+            "Avoid contact with bodily fluids: This includes blood, saliva, urine, faeces, sweat, vomit, breast milk, semen, and vaginal fluids from infected individuals.",
+            "Avoid contact with potentially contaminated materials: This includes clothing, bedding, needles, medical equipment, and other items that may have come into contact with infected bodily fluids.",
+            "Practice strict hygiene: Frequent handwashing with soap and water or use of alcohol-based hand sanitizer is crucial.",
+            "Use personal protective equipment (PPE): When caring for someone with Ebola or handling potentially contaminated materials, PPE such as gloves, gowns, masks, and eye protection is essential.",
+            "Safe burial practices: Avoid direct contact with the body of someone who has died from Ebola.",
+            "Ebola vaccination: The ERVEBO vaccine is available to help prevent the Zaire ebolavirus.",
+            "Avoid travel to affected areas: If travel to areas with Ebola outbreaks is unavoidable, follow guidance from the Centres for Disease Control and Prevention (CDC) on protecting yourself.",
+            "Monitor your health: If you return from an area with an Ebola outbreak, monitor your health for 21 days and seek medical care immediately if you develop symptoms."
+        ],
+        "high_risk_areas": "Ebola high-risk areas are primarily located in sub-Saharan Africa, with a greater concentration in the western, central, and eastern regions. Specific countries frequently mentioned include Guinea, Liberia, Sierra Leone, Nigeria, the Democratic Republic of Congo, Uganda, and Ethiopia. Bordering countries of the Democratic Republic of Congo, such as Burundi, Rwanda, South Sudan, and Uganda, were also identified as high-risk during a past outbreak.",
+        "summary": "Ebola is a severe, often fatal illness in humans caused by a virus. It's characterized by fever, bleeding, and can lead to death. The virus is primarily found in sub-Saharan Africa and can be transmitted through direct contact with the bodily fluids of an infected person or animal. While there are no approved vaccines or treatments for all Ebola virus species, early supportive care and rehydration can improve survival rates. Ebola is caused by a virus belonging to the Ebolavirus genus. Supportive care, such as rehydration and treatment of symptoms, can improve chances of survival. Experimental vaccines and treatments are under development."
+    },
+    {
+        "name": "Typhoid Fever",
+        "description": "Typhoid fever is a systemic infection caused by the bacterium Salmonella Typhi, and sometimes Salmonella Paratyphi. It's typically spread through contaminated food or water and can lead to serious illness if left untreated. Symptoms include prolonged high fever, headache, abdominal pain, and sometimes diarrhea or constipation.",
+        "symptoms":[
+            "Fever, which may start low and increase throughout the day.",
+            "General feeling of being unwell (malaise).",
+            "Abdominal pain.",
+            "Headache.",
+            "Fatigue and weakness.",
+            "Loss of appetite.",
+            "Cough.",
+            "High fever (up to 104°F or 40°C).",
+            "Severe diarrhoea or constipation.",
+            "Rash of small, flat, pink spots (rose spots) on the chest and abdomen.",
+            "Muscle aches.",
+            "Delirium, confusion, and hallucinations in severe cases.",
+            "Severe abdominal pain.",
+            "Possible complications include intestinal bleeding or perforation, which can be life-threatening."
+        ],
+        "how_contracted":[
+            "Typhoid fever is contracted through the ingestion of food or water contaminated with the bacteria Salmonella Typhi. This contamination typically occurs when someone who is infected or a carrier of the bacteria contaminates food or water sources, or when contaminated sewage enters a water supply.",
+            "Faecal-oral route: The bacteria are shed in the faeces and urine of infected individuals and carriers.",
+            "Contaminated food and water: If these bodily fluids contaminate food or water sources, individuals can become infected by consuming the contaminated items.",
+            "Poor hygiene: Inadequate handwashing after using the toilet, particularly in areas with poor sanitation, can facilitate the spread of the bacteria to food or other surfaces.",
+            "Unsafe water: Drinking water contaminated with sewage or using it to wash food can also lead to infection.",
+            "Travel: Travelers to areas where typhoid fever is common are at higher risk, particularly if they consume food or water from questionable sources.",
+            "Contact with carriers: Close contact with individuals who are carriers of the bacteria, even if they don't have symptoms, can also lead to transmission."
+        ],
+        "diagnosis":[
+            "Blood Culture: This involves growing the bacteria from a blood sample in a laboratory, and is considered the most reliable method for confirming typhoid fever.",
+	        "Stool Culture: This test can also identify the bacteria in a stool sample, and is more likely to be positive in later stages of the illness.",
+	        "Urine Culture: Similar to stool cultures, this test can identify the bacteria in a urine sample.",
+	        "Serological Tests: These tests, like the Widal test, detect antibodies against Salmonella Typhi in the blood. However, they are less specific and can be positive even after past infection or vaccination.",
+	        "Polymerase Chain Reaction (PCR): This molecular test can detect the genetic material of the bacteria in blood, stool, or urine samples, and is highly sensitive and specific."
+        ],
+        "treatment":[
+            "First-line antibiotics: Ciprofloxacin, ampicillin, chloramphenicol, and trimethoprim-sulfamethoxazole are commonly used.",
+            "Antibiotic resistance: Some strains of Salmonella Typhi are resistant to certain antibiotics, requiring alternative treatments like azithromycin or cephalosporins (ceftriaxone).",
+            "Severe cases: In severe cases, carbapenems or steroids (like dexamethasone) may be used.",
+            "Hydration: Drinking plenty of fluids is essential to prevent dehydration, especially due to diarrhoea.",
+            "Hospitalization: Severe cases may require intravenous fluids or other supportive care in a hospital.",
+            "Surgical intervention: In rare cases of intestinal perforation, surgery may be necessary.",
+            "Rest: Resting quite important for recovery."
+        ],
+        "prevention":[
+            "Typhoid vaccines are available and can significantly reduce the risk of infection, especially for travellers to endemic areas.",
+            "Consult a healthcare provider about vaccination, particularly if traveling to regions with high typhoid prevalence.",
+            "Two types of typhoid vaccines are available: injectable and oral.",
+            "Injectable vaccines require booster doses every 2 years, while oral vaccines require boosters every 5 years.",
+            "Safe Food and Water Practices.",
+            "Drink only bottled or boiled water, or water that has been disinfected.",
+            "Avoid ice unless it is made from safe water.",
+            "Eat only thoroughly cooked food that is still hot when served.",
+            "Avoid raw vegetables and fruits that cannot be peeled, especially lettuce, as they may be contaminated.",
+            "Be cautious about food and drinks from street vendors, especially those served at room temperature.",
+            "Wash hands frequently with soap and water, especially after using the toilet, before eating, and after handling raw foods.",
+            "Use a toilet or latrine and dispose of faeces properly.",
+            "Keep the toilet or latrine clean.",
+            "Wash hands with soap and clean water after using the toilet or latrine.",
+            "Be aware of potential sources of contamination, such as contaminated water supplies or food preparation areas.",
+            "Seek medical care promptly if symptoms of typhoid fever develop."
+        ],
+        "high_risk_areas":"Typhoid fever is most prevalent in developing countries, particularly in parts of Asia and Africa. Specific areas with high rates include the Indian subcontinent, South and Southeast Asia (especially Bangladesh, India, and Pakistan), and parts of Africa. South Africa, while endemic, also experiences outbreaks. Travelers to these regions, especially those visiting friends and relatives, are at increased risk.",
+        "summary": "Typhoid fever is a serious bacterial infection caused by Salmonella Typhi, spread through contaminated food or water. It's characterized by a prolonged high fever, fatigue, headache, and abdominal pain. If left untreated, typhoid fever can lead to severe complications like intestinal bleeding or perforation, and even death. Treatment typically involves antibiotics, but antibiotic resistance is a growing concern."
+    },
+    {
+        "name": "Chagas Disease",
+        "description": "Chagas disease, also known as American trypanosomiasis, is a potentially life-threatening illness caused by the parasite Trypanosoma cruzi. It's primarily transmitted to humans through the feces of infected triatomine bugs, often called 'kissing bugs,' which bite and feed on humans. The disease has two phases: an acute phase, which may be asymptomatic or cause mild symptoms, and a chronic phase, which can lead to severe heart and digestive problems years or even decades later.",
+        "symptoms":[
+            "Fever",
+            "Fatigue",
+            "Body aches",
+            "Headache",
+            "Rash",
+            "Loss of appetite",
+            "Diarrhea.",
+            "Vomiting.",
+            "Swelling of the eyelids (Romaña's sign).",
+            "Swelling or a sore near the bite (chagoma).",
+            "Enlarged lymph nodes.",
+            "Chronic symptoms: Heart problems; Heart failure, abnormal heart rhythms (arrhythmias), enlarged heart.",
+            "Chronic symptoms: Digestive problems; Difficulty swallowing, constipation, enlarged oesophagus (megaoesophagus), enlarged colon (megacolon)."
+        ],
+        "how_contracted":[
+            "Chagas disease is primarily contracted through contact with the faeces of infected triatomine bugs, also known as 'kissing bugs'. These bugs, when they bite and feed on a person, often defecate or urinate nearby, and the parasite, Trypanosoma cruzi, can enter the body through the bite wound, mucous membranes, or breaks in the skin.",
+            "Triatomine Bug Bites: Triatomine bugs, typically found in cracks and crevices of poorly constructed homes, feed on blood and then defecate or urinate near the bite wound.",
+            "Parasite Entry: The parasite, Trypanosoma cruzi, is present in the bug's faeces and can enter the body through the bite wound, mucous membranes (like the eyes or mouth), or through breaks in the skin.",
+            "Scratching: People often unknowingly scratch the bite area, pushing the infected faeces into the wound or other entry points, facilitating infection.",
+            "Typical Entry Points: Bites are a common entry point, but the parasites can also enter through the eyes or mouth, especially if one touches the area with contaminated fingers.",
+            "Mother-to-child (Congenital): A pregnant woman with Chagas disease can transmit the parasite to her baby during pregnancy or childbirth.",
+            "Blood Transfusion and Organ Transplantation: Rarely, the disease can be transmitted through infected blood transfusions or organ transplants.",
+            "Contaminated Food and Drink: Consuming food or beverages contaminated with the faeces of infected triatomine bugs can also lead to infection."
+        ],
+        "diagnosis":[
+            "Blood Tests: The most common method for diagnosing Chagas disease is through blood tests that detect the presence of Trypanosoma cruzi antibodies or the parasite itself.",
+            "Microscopic Examination: A blood smear can be examined under a microscope to look for the parasite during the acute phase of the disease.",
+            "Serological Tests: These tests detect antibodies against Trypanosoma cruzi in the blood, indicating exposure to the parasite.",
+            "Polymerase Chain Reaction (PCR): This molecular test can detect the genetic material of the parasite in blood samples, especially useful during the acute phase.",
+            "Electrocardiogram (ECG): In cases where heart involvement is suspected, an ECG can help assess heart function and identify any abnormalities.",
+            "Diagnose acute Chagas using light microscopy of blood smears (thin or thick) or a tissue sample or PCR-based assays. Diagnose chronic T. cruzi infection by screening enzyme-linked immunosorbent blood assay (ELISA) with confirmatory radioimmunoprecipitation assay (RIPA) or other assay for antibodies."
+        ],
+        "treatment":[
+            "Antiparasitic Medications: Benznidazole and nifurtimox are the primary medications used to treat Chagas disease, especially in the acute phase. They can help eliminate the parasite from the body.",
+            "Supportive Care: In chronic cases, treatment focuses on managing symptoms and complications, such as heart failure or digestive issues.",
+            "Regular Monitoring: Patients with chronic Chagas disease should be monitored regularly for any progression of heart or digestive problems.",
+            "Heart Failure Management: If heart failure develops, treatment may include medications to manage symptoms and improve heart function.",
+            "Surgery: In severe cases, surgical interventions may be necessary to address complications like megaoesophagus or megacolon."
+        ],
+        "prevention":[
+            "Reduce bug habitats: Improve housing by using plastered walls and screened windows to prevent bug entry, and clear vegetation around homes.",
+            "Insecticide spraying: Community-based vector control programs using insecticides can help reduce bug populations.",
+            "Personal protection: Use insecticide-treated bed nets, especially when sleeping outdoors or in areas with poor housing.",
+            "Avoid sleeping outdoors or in poorly constructed housing.",
+            "Apply insect repellent: to exposed skin.",
+            "Proper food preparation: Ensure food is cooked thoroughly and handled safely to prevent oral transmission.",
+            "Safe water sources: Use clean and safe water sources to avoid contamination.",
+            "Blood and organ donation: Screen blood and organ donors for Chagas disease to prevent transmission through transfusions and transplants.",
+            "Pregnant women: Test pregnant women for Chagas disease and treat infected mothers and newborns."
+        ],
+        "high_risk_areas": "Argentina, Bolivia, Brazil, Chile, Colombia, Ecuador, El Salvador, Guatemala, Mexico, Paraguay, Peru, Belize, Costa Rica, Honduras, Nicaragua, and Panama and Venezuela.",
+        "summary":"Chagas disease is a parasitic illness caused by the parasite Trypanosoma cruzi, primarily found in Central and South America. It's often transmitted through the bite of the triatomine bug (also known as the 'kissing bug'), which defecates near the bite wound, leaving behind faeces containing the parasite. The disease progresses through acute and chronic phases, potentially leading to severe heart and gastrointestinal problems."
+    },
+    {
+        "name": "Gastroenteritis",
+        "description": "Gastroenteritis, often called the stomach flu, is an inflammation of the stomach and intestines, causing symptoms like diarrhea, vomiting, and abdominal cramps. It's typically caused by viral, bacterial, or parasitic infections, but can also result from chemical toxins or certain medications. While usually not serious in healthy individuals, gastroenteritis can lead to dehydration, especially in vulnerable populations like infants and the elderly.",
+        "symptoms":[
+            "Diarrhea (often watery)",
+            "Nausea and vomiting",
+            "Stomach cramps and pain",
+            "Loss of appetite",
+            "Fever",
+            "Chills",
+            "Fatigue and body aches",
+            "Headache",
+            "Dehydration",
+            "Extreme thirst and dry mouth",
+            "Urination less than usual",
+            "Lethargy"
+        ],
+        "how_contracted":[
+            "Gastroenteritis, often called stomach flu, is primarily contracted through the faecal-oral route, meaning exposure to infected stool or vomit. This can happen through contaminated food or water, direct contact with an infected person, or indirect contact with contaminated surfaces or objects.",
+            "Contaminated Food and Water: Eating food or drinking water that has been contaminated with viruses, bacteria, or parasites from infected faeces is a common way to get gastroenteritis.",
+            "Person-to-Person Contact: Direct contact with an infected person, such as through shaking hands or close proximity, can spread the illness if the person's hands are contaminated with infected stool.",
+            "Indirect Contact: Touching contaminated surfaces (like doorknobs, toys, or food preparation areas) or objects (like utensils) that have been touched by an infected person can also lead to infection.",
+            "Airborne Transmission: In some cases, airborne particles from vomit can transmit the virus, especially with norovirus.",
+            "Contact with Animals: In some instances, gastroenteritis can be acquired through contact with infected animals."
+        ],
+        "diagnosis":[
+            "Symptom Assessment: Doctors will inquire about your symptoms, which may include diarrhoea, vomiting, abdominal pain, nausea, fever, and muscle aches.",
+            "Physical Examination: A physical exam may involve checking vital signs (like blood pressure and temperature), listening to bowel sounds, and assessing for dehydration.",
+            "Stool Testing: If needed, stool samples can be analysed to identify the causative agent (bacteria, virus, or parasite). For instance, rapid stool tests can detect rotavirus or norovirus.",
+            "Other Tests: In some cases, blood tests (like a CBC or electrolyte panel) or imaging studies (like a CT scan) might be used to rule out other conditions or assess for complications like dehydration."
+        ],
+        "treatment":[
+            "Rest is crucial for recovery. Oral rehydration solutions (like Pedialyte) are recommended for replacing lost fluids and electrolytes, especially for children and older adults. Avoid sugary drinks like sports drinks, especially if severely dehydrated, as they can worsen symptoms. In severe cases, intravenous fluids may be necessary.",
+            "Once nausea subsides, gradually introduce bland, easy-to-digest foods like crackers, toast, bananas, and applesauce. Avoid dairy products, caffeine, alcohol, and fatty or spicy foods initially.",
+            "Anti-emetics: Medications like ondansetron (Zofran) or metoclopramide (Reglan) can help manage severe nausea and vomiting.",
+            "Anti-diarrheals: Loperamide (Imodium) or bismuth subsalicylate (Pepto-Bismol) can help reduce diarrhoea but are generally not recommended for children or older adults.",
+            "Antibiotics: Antibiotics are usually not prescribed for viral gastroenteritis but may be necessary for bacterial or parasitic infections."
+        ],
+        "prevention":[
+            "Wash hands frequently and thoroughly with soap and water for at least 20 seconds, especially after using the restroom, before eating, and after contact with potentially contaminated surfaces.",
+            "Use alcohol-based hand sanitizers when soap and water are unavailable, but note that they may not be as effective against some viruses like norovirus.",
+            "Cook food thoroughly, especially meat and seafood, to kill harmful bacteria and viruses.",
+            "Refrigerate perishable foods promptly to prevent bacterial growth.",
+            "Avoid consuming raw or undercooked foods, including eggs and unpasteurized dairy products.",
+            "Wash fruits and vegetables thoroughly, especially if you eat them raw.",
+            "Avoid swallowing water while swimming, especially in potentially contaminated sources.",
+            "If you are unsure about the safety of your drinking water, use bottled water or boil it before consumption.",
+            "Vaccines are available for infants to protect against rotavirus, a common cause of gastroenteritis in young children.",
+            "Avoid swallowing water while swimming, especially in potentially contaminated sources. If you are unsure about the safety of your drinking water, use bottled water or boil it before consumption."
+        ], 
+        "high_risk_areas":[
+            "households, schools, and healthcare facilities.",
+            "Gastroenteritis, particularly traveller’s diarrhoea, is more prevalent in certain regions, notably Central and South America, Mexico, Africa, and South Asia."
+        ],
+        "summary": "Gastroenteritis, often called the 'stomach flu' or 'gastro,' is an inflammation of the stomach and intestines, usually caused by a viral or bacterial infection, and sometimes by parasites or chemicals. It is characterized by symptoms like diarrhoea, vomiting, nausea, and abdominal pain or cramps. While generally mild and self-limiting in healthy individuals, it can lead to complications like dehydration, especially in vulnerable populations like infants and older adults. Viral infections (like norovirus and rotavirus) are the most common cause, but bacterial infections (including food poisoning from contaminated food or water), parasites, and certain chemicals can also trigger gastroenteritis."
+    },
+    {
+        "name": "Cholera",
+        "description":"Cholera is a bacterial infection that spreads through contaminated food and water, causing severe diarrhea and dehydration, and potentially death if left untreated. It's a significant public health concern, particularly in areas with poor sanitation and limited access to clean water.",
+        "symptoms":[
+            "Severe watery diarrhea: Often described as 'rice-water' stools, which are clear or slightly cloudy and may contain flecks of mucus.",
+            "Vomiting: Can occur, especially in the early stages of the disease.",
+            "Dehydration: Rapid loss of fluids can lead to dehydration, which is a critical concern in cholera.",
+            "Electrolyte imbalance: Loss of electrolytes can cause muscle cramps and weakness.",
+            "Rapid heart rate: Due to dehydration and fluid loss.",
+            "Low blood pressure: Can occur due to severe dehydration.",
+            "Thirst: Intense thirst is common as the body tries to compensate for fluid loss.",
+            "Dry skin and mucous membranes: Signs of dehydration.",
+            "Sunken eyes: A sign of severe dehydration.",
+            "Lethargy or restlessness: Especially in children.",
+            "Restlessness or irritability: These can be signs of dehydration and electrolyte imbalance.",
+            "Irregular heartbeat (arrhythmia): Can be a sign of severe electrolyte imbalance.",
+        	"Low urine output or lack of tears: These are signs of dehydration."
+        ],
+        "how_contracted":[
+            "Cholera is primarily contracted through the ingestion of food or water contaminated with the bacterium Vibrio cholerae. This contamination often occurs in areas with poor sanitation and limited access to clean water.",
+            "Contaminated Water: Drinking water that has been contaminated with Vibrio cholerae, often due to sewage contamination or inadequate water treatment.",
+            "Contaminated Food: Eating food that has been prepared or washed with contaminated water, or food that has been handled by an infected person.",
+            "Poor Sanitation: Living in areas with inadequate sanitation facilities can increase the risk of exposure to the bacteria.",
+            "Person-to-Person Contact: While less common, cholera can be transmitted through direct contact with an infected person's bodily fluids, such as vomit or feces.",
+            "Faecal-oral route: The bacteria are shed in the faeces of infected individuals and can then contaminate water and food sources, leading to further spread.",
+            "Low Stomach Acid: Individuals with low stomach acid, such as children, older adults, and those taking certain medications, may be more susceptible to infection.",
+            "Specific Foods: Raw or undercooked seafood, especially shellfish from contaminated waters, can also be a source of infection."
+        ],
+        "diagnosis":[
+            "Clinical Diagnosis: Based on symptoms like severe watery diarrhea, vomiting, and dehydration, especially in areas where cholera is endemic.",
+            "Stool Culture: A stool sample can be tested in a laboratory to confirm the presence of Vibrio cholerae.",
+            "Rapid Diagnostic Tests: These tests can quickly detect cholera antigens in stool samples.",
+            "Serological Tests: Blood tests can help identify antibodies against Vibrio cholerae, but are less commonly used for diagnosis.",
+            "Dehydration Assessment: Assessing for signs of dehydration, such as dry mucous membranes, decreased urination, and sunken eyes, is crucial for guiding treatment.",
+	        "Specimen Collection: Stool samples should be collected and transported to the lab using appropriate methods, such as Cary-Blair transport medium, to ensure the viability of the bacteria."
+        ],
+        "treatment":[
+            "Oral Rehydration Salts (ORS): This is the most important treatment and involves drinking a solution of salts and minerals mixed with safe water. ORS is available as a powder that can be mixed with boiled or treated water.",
+            "Intravenous Fluids: Severely dehydrated patients may need fluids administered through an IV.",
+            "Other Fluids: If ORS is unavailable, safe water, broth, or other fluids can be used, but sugary drinks should be avoided as they can worsen diarrhoea.",
+            "Breastfeeding/Formula: Babies with watery diarrhoea should continue to be fed breast milk or formula.",
+            "Antibiotics are not always necessary for mild cases, but they can help shorten the duration of diarrhoea and reduce the amount of Vibrio cholerae bacteria in the body, potentially reducing contagiousness",
+            "Seek immediate medical attention if you suspect cholera, as dehydration can occur rapidly.",
+            "Avoid anti-diarrheal medications, as they can worsen cholera.",
+            "Early and effective rehydration is crucial for preventing severe illness and death."
+        ],
+        "prevention":[
+            "Drink only bottled, boiled, or treated water.",
+            "Use safe water for brushing teeth, making ice, and preparing food.",
+            "Consider using bottled or purified water even for handwashing if the local water supply is questionable.",
+            "Proper Hygiene",
+            "Wash hands frequently with soap and safe water, especially before eating, after using the toilet, and after handling food.",
+            "Use alcohol-based hand sanitizer when soap and water are unavailable.",
+            "Safe Food Handling.",
+            "Cook food thoroughly, especially seafood and shellfish.",
+            "Eat food while it is still hot and avoid food from street vendors if possible.",
+            "Peel fruits and vegetables yourself and avoid salads and raw vegetables.",
+            "Use toilets or proper sanitation systems to dispose of human waste.",
+            "Double-bag and dispose of items contaminated with faeces.",
+            "Consider cholera vaccination when traveling to areas with outbreaks.",
+            "Even with vaccination, safe hygiene and food/water practices are crucial.",
+            "Seek immediate medical attention if you experience symptoms like severe diarrhoea and vomiting.",
+            "Prompt treatment with oral rehydration solutions and sometimes antibiotics can be lifesaving.",
+            "Ensure access to clean water and sanitation facilities is available for all residents.",
+            "Strengthen surveillance and early warning systems for outbreaks.",
+            "Educate communities about cholera prevention and treatment.",
+            "Promote hygiene education and awareness campaigns."
+        ],
+        "high_risk_areas":[
+            "Provinces like Limpopo, Mpumalanga, KwaZulu-Natal, and North West are particularly at risk due to cross-border movement from affected neighbouring countries and potential disruptions to sanitation systems from flooding.",
+	        "South Sudan, the Democratic Republic of the Congo, and Ethiopia. Other countries with active cholera transmission and high-risk areas include Zambia, Angola, Somalia, Zimbabwe, Malawi, Kenya, and Mozambique."
+        ],
+        "summary": "Cholera is an acute diarrheal infection caused by the bacterium Vibrio cholerae and is spread through contaminated food or water. It can cause severe diarrhoea and dehydration, and if left untreated, can be fatal. While most cases are mild or moderate, severe cases can lead to rapid dehydration and death within hours. Oral rehydration solutions (ORS) are typically used for mild to moderate cases, while severe cases may require intravenous fluids and antibiotics. Access to safe water, sanitation, and hygiene practices are crucial for preventing cholera outbreaks."
     }
 ]
 }

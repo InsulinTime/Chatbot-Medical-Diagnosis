@@ -139,12 +139,20 @@ def analyze_symptoms(user_input: str, lang: str = "en") -> Dict:
             if symptom.lower() in input_lower:
                 context['symptoms'].append(symptom)
     
-    for loc in ["durban", "cote d'ivoire", "botswana", "Zimbabwe", "Nigeria", "Ghana", ]:
+    for loc in ["durban", "cote d'ivoire", "botswana", "Zimbabwe", "Nigeria", "Ghana", "Tanzania",
+                 "Guinea", "Liberia", "Sierra Leone", "the Democratic Republic of Congo", "Uganda",
+                   "Ethiopia", "Kenya", "South Africa", "Mozambique", "Angola", "Namibia", "Zambia",
+                    "Burundi", "Rwanda", "South Sudan", "Argentina", "Paraguay", "Columbia", "Brazil",
+                     "India", "Pakistan", "Bangladash", "French Guiana", "Guyana", "Suriname", "Venezuela",
+                       "Peru", "Bolivia", "Ecuador", "El Salvador", "Mexico", "Peru", "Belize", "Costa Rica",
+                         "Honduras", "Nicaragua", "Panama", "Limpopo", "Mpumalanga", "KwaZulu-Natal", "North West",
+                            "Angola", "Somalia", "Malawi" ]:
         if loc in input_lower:
             context['locations'].append(loc)
     
     risk_activities = ["unprotected sex", "mosquito bite", "needle sharing", "contact with contaminated water", "eating raw meat", 
-                       "contact with infected person", "travel and exposed to high-risk area", "poor sanitation", "close contact with certain animals", "Sharing Utensils and Cups", "bug bites", "drinking untreated water", "exposured to contaminated surfaces"]
+                       "contact with infected person", "travel and exposed to high-risk area", "poor sanitation", "close contact with certain animals",
+                        "Sharing Utensils and Cups", "bug bites", "drinking untreated water", "exposured to contaminated surfaces"]
     for activity in risk_activities:
         if activity in input_lower:
             context['activities'].append(activity)
