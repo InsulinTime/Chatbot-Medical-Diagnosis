@@ -124,6 +124,65 @@ def find_matching_disease(user_input: str) -> Optional[Dict[str, Any]]:
     
     return None
 
+def analyze_symptoms(user_input: str, lang: str = "en") -> Dict:
+    """Analyze symptoms using medical data and patient context"""
+    context = {
+        'symptoms': [],
+        'locations': [],
+        'activities': [],
+        'contacts': []
+    }
+    
+    input_lower = user_input.lower()
+    for disease in medical_disease_data['diseases']:
+        for symptom in disease['symptoms']:
+            if symptom.lower() in input_lower:
+                context['symptoms'].append(symptom)
+    
+    for loc in ["durban", "cote d'ivoire", "botswana", "Zimbabwe", "Nigeria", "Ghana", ]:
+        if loc in input_lower:
+            context['locations'].append(loc)
+    
+    risk_activities = ["unprotected sex", "mosquito bite", "needle sharing", "contact with contaminated water", "eating raw meat", 
+                       "contact with infected person", "travel and exposed to high-risk area", "poor sanitation", "close contact with certain animals", "Sharing Utensils and Cups", "bug bites", "drinking untreated water", "exposured to contaminated surfaces"]
+    for activity in risk_activities:
+        if activity in input_lower:
+            context['activities'].append(activity)
+    
+    possible_conditions = []
+    for disease in medical_disease_data['diseases']:
+        score = 0
+        
+        symptom_matches = sum(1 for s in disease['symptoms'] 
+                          if any(s.lower() in inp for inp in [input_lower, *context['symptoms']]))
+        
+        location_matches = any(loc.lower() in disease.get('high_risk_areas', []) 
+                           for loc in context['locations'])
+        
+        activity_matches = any(act.lower() in ' '.join(disease.get('how_contracted', []))
+                           for act in context['activities'])
+        
+        score = (symptom_matches * 3) + (location_matches * 2) + activity_matches
+        
+        if score > 0:
+            possible_conditions.append({
+                'disease': disease['name'],
+                'score': score,
+                'matched_symptoms': [s for s in disease['symptoms'] 
+                                  if any(s.lower() in inp for inp in [input_lower, *context['symptoms']])],
+                'matched_activities': [a for a in disease.get('how_contracted', [])
+                                     if any(a.lower().contains(act) for act in context['activities'])],
+                'matched_locations': [loc for loc in disease.get('high_risk_areas', [])
+                                    if any(loc.lower() == l.lower() for l in context['locations'])]
+            })
+    
+    possible_conditions.sort(key=lambda x: x['score'], reverse=True)
+    
+    return {
+        'context': context,
+        'possible_conditions': possible_conditions[:3]
+    }
+
 def format_disease_response(disease_info: Dict[str, Any], rag_context: str = "") -> str:
     """Format disease information into a structured response with South African context."""
     sections = [
@@ -174,6 +233,41 @@ def format_disease_response(disease_info: Dict[str, Any], rag_context: str = "")
         ])
     
     return "".join(response)
+
+def format_diagnostic_response(analysis: Dict, context: str, lang: str) -> str:
+    """Format the diagnostic results for the patient"""
+    conditions = analysis['possible_conditions']
+    
+    if not conditions:
+        return "I couldn't determine possible conditions. Please consult a doctor."
+    
+    response = [
+        "Based on your symptoms and history, possible conditions include:",
+        ""
+    ]
+    
+    for cond in conditions:
+        disease_info = next((d for d in medical_disease_data['diseases'] 
+                           if d['name'] == cond['disease']), None)
+        if not disease_info:
+            continue
+            
+        response.extend([
+            f"• {cond['disease']} (Probability: {cond['score']}/10)",
+            f"  - Matching symptoms: {', '.join(cond['matched_symptoms'])}",
+            f"  - Possible causes: {', '.join(cond['matched_activities'])}",
+            f"  - Recommended action: {disease_info['treatment'][0] if disease_info['treatment'] else 'Consult doctor'}",
+            ""
+        ])
+    
+    response.extend([
+        "Additional information from medical sources:",
+        context,
+        "",
+        "This is not a diagnosis. Please see a healthcare professional for confirmation."
+    ])
+    
+    return "\n".join(response)
 
 def get_clinic_info(location: str) -> str:
     """Generate mock clinic information based on location"""
@@ -405,7 +499,6 @@ def chat():
             logger.debug(f"Translated input: {user_input} -> {processed_input}")
         
         disease_info = find_matching_disease(processed_input)
-        
         if disease_info:
             docs = retriever.invoke(disease_info['name'])[:1]
             rag_context = docs[0].page_content[:300] if docs else ""
@@ -422,41 +515,48 @@ def chat():
                         "answer": f"(Translation not available) {english_response}",
                         "warning": f"Full translation to {LANGUAGE_MAP[target_lang]} not available"
                     })
-            
             return jsonify({"answer": english_response})
         
-        else:
+        analysis = analyze_symptoms(processed_input, target_lang)
+        
+        if should_ask_followup(processed_input) and not analysis.get('high_confidence_match', False):
             followups = generate_followups(processed_input, session.get('chat_history', []))
-            
-            if should_ask_followup(processed_input):
+            if followups:
                 return jsonify({
                     "action": "ask_followup",
                     "questions": followups[:2]
                 })
         
-        docs = retriever.invoke(processed_input)
-        context = "\n".join(d.page_content[:300] for d in docs[:2])
+        top_conditions = [cond['disease'] for cond in analysis['possible_conditions']]
+        context = ""
+        for condition in top_conditions:
+            docs = retriever.invoke(condition)[:1]
+            if docs:
+                context += f"\n\n{condition}:\n{docs[0].page_content[:300]}"
         
-        disease_list = ", ".join(medical_disease_data.keys())
-        enhanced_prompt = system_prompt.format(
-            context=context,
-            input=processed_input,
-            disease_list=disease_list
-        )
-        
-        raw_response = llm(enhanced_prompt, max_length=800)[0]['generated_text']
-        final_response = enhance_response(raw_response, llm)
+        if analysis['possible_conditions']:
+            english_response = format_diagnostic_response(analysis, context, target_lang)
+        else:
+            docs = retriever.invoke(processed_input)
+            context = "\n".join(d.page_content[:300] for d in docs[:2])
+            disease_list = ", ".join(medical_disease_data.keys())
+            enhanced_prompt = system_prompt.format(
+                context=context,
+                input=processed_input,
+                disease_list=disease_list
+            )
+            raw_response = llm(enhanced_prompt, max_length=800)[0]['generated_text']
+            english_response = enhance_response(raw_response, llm)
         
         if target_lang != "en":
             try:
-                translated_response = translate_text(final_response, target_lang)
-                return jsonify({"answer": translated_response})
+                translated_response = translate_text(english_response, target_lang)
+                final_response = translated_response
             except Exception as e:
                 logger.error(f"Failed to translate response to {target_lang}: {str(e)}")
-                return jsonify({
-                    "answer": f"(Translation not available) {final_response}",
-                    "warning": f"Full translation to {LANGUAGE_MAP[target_lang]} not available"
-                })
+                final_response = f"(Translation not available) {english_response}"
+        else:
+            final_response = english_response
         
         return jsonify({"answer": final_response})
         
