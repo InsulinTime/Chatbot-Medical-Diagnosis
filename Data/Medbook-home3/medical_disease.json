@@ -2244,8 +2244,8 @@
             "Promote hygiene education and awareness campaigns."
         ],
         "high_risk_areas":[
-            "Provinces like Limpopo, Mpumalanga, KwaZulu-Natal, and North West are particularly at risk due to cross-border movement from affected neighbouring countries and potential disruptions to sanitation systems from flooding.",
-	        "South Sudan, the Democratic Republic of the Congo, and Ethiopia. Other countries with active cholera transmission and high-risk areas include Zambia, Angola, Somalia, Zimbabwe, Malawi, Kenya, and Mozambique."
+            "Provinces like", "Limpopo", "Mpumalanga", "KwaZulu-Natal", "North West",
+	        "South Sudan", "the Democratic Republic of the Congo", "Ethiopia", "Zambia", "Angola", "Somalia", "Zimbabwe", "Malawi", "Kenya", "Mozambique."
         ],
         "summary": "Cholera is an acute diarrheal infection caused by the bacterium Vibrio cholerae and is spread through contaminated food or water. It can cause severe diarrhoea and dehydration, and if left untreated, can be fatal. While most cases are mild or moderate, severe cases can lead to rapid dehydration and death within hours. Oral rehydration solutions (ORS) are typically used for mild to moderate cases, while severe cases may require intravenous fluids and antibiotics. Access to safe water, sanitation, and hygiene practices are crucial for preventing cholera outbreaks."
     }

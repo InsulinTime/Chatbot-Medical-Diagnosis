@@ -33,7 +33,7 @@ def load_medical_disease_data(file_path="Data/Medbook-home3/medical_disease.json
         # Construct absolute path
         abs_path = Path(__file__).parent.parent / file_path
         
-        with open(abs_path, 'r') as f:
+        with open(abs_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
         # Process the data into a more usable format

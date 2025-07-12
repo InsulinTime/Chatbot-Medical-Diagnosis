@@ -19,6 +19,7 @@ from typing import Dict, Any, Optional, List
 from googletrans import Translator
 from datetime import timedelta
 
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -183,6 +184,15 @@ def analyze_symptoms(user_input: str, lang: str = "en") -> Dict:
                 'matched_locations': [loc for loc in disease.get('high_risk_areas', [])
                                     if any(loc.lower() == l.lower() for l in context['locations'])]
             })
+        result = {}
+        if possible_conditions and possible_conditions[0]['score'] >= 7:
+            possible_conditions[0]['urgent'] = True
+            possible_conditions[0]['urgent_symptoms'] = disease.get('urgent_symptoms', [])
+            result['high_confidence_match'] = True
+        else:
+            result['high_confidence_match'] = False
+        
+        return result
     
     possible_conditions.sort(key=lambda x: x['score'], reverse=True)
     
@@ -401,17 +411,17 @@ prompt = ChatPromptTemplate.from_messages(
 def generate_followups(patient_input: str, chat_history: List[str]) -> str:
     """Generate clinical follow-up questions based on conversation"""
     prompt = f"""As a clinician, what are 5 most important follow-up questions for:
-Patient: {patient_input}
-History: {chat_history[-2:] if chat_history else "None"}
+    Patient: {patient_input}
+    History: {chat_history[-2:] if chat_history else "None"}
 
-Respond in this format:
-1. [Priority 1 question]
-2. [Priority 2 question]
-3. [Priority 3 question]
-4. [Priority 4 question]
-5. [Priority 5 question]"""
-    
-    questions = llm(prompt, max_length=200)[0]['generated_text']
+    Respond in this format:
+    1. [Priority 1 question]
+    2. [Priority 2 question]
+    3. [Priority 3 question]
+    4. [Priority 4 question]
+    5. [Priority 5 question]"""
+        
+    questions = llm(prompt, max_length=400)[0]['generated_text']
     return [q.split(".")[1].strip() for q in questions.split("\n") if q]
 
 question_answer_chain = create_stuff_documents_chain(llm, prompt)
@@ -592,7 +602,6 @@ def get_translated_error(lang, error_details=""):
         'tn': "Ke na le mathata a go araba seo. Tsweetswee leka gape kgotsa buisa potso ya gago ka tsela e nngwe."
     }
     
-    # Default to English if language not supported
     return error_messages.get(lang, error_messages['en']) + (
         f"\n(Technical details: {error_details}" if app.debug else "")
     
