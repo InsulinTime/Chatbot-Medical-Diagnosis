@@ -18,6 +18,7 @@ import logging
 from typing import Dict, Any, Optional, List
 from googletrans import Translator
 from datetime import timedelta
+from collections import deque
 
 
 logging.basicConfig(level=logging.INFO)
@@ -42,6 +43,8 @@ os.environ["HUGGINGFACE_API_TOKEN"] = HUGGINGFACE_API_TOKEN
 embeddings = download_huggingface_embeddings()
 index_name = "medicalbot"
 medical_disease_data = load_medical_disease_data()
+conversation_memory = {}
+MAX_HISTORY = 4
 
 LANGUAGE_MAP = {
     'en': 'english',
@@ -391,17 +394,17 @@ def get_translated_error(lang, error_details=""):
     return error_messages.get(lang, error_messages['en']) + (
         f"\n(Technical details: {error_details}" if app.debug else "")
 
-
-llm = pipeline (
-    task="text2text-generation",
-    model="google/flan-t5-large",
+llm = pipeline(
+    task="text-generation",
+    model="NousResearch/Hermes-2-Pro-Mistral-7B",
+    # Alternative free models:
+    # - "mistralai/Mistral-7B-Instruct-v0.1"
     token=os.getenv("HUGGINGFACE_API_TOKEN"),
-    max_length=9000,
-    temperature=0.6,
-    top_p=0.95,
-    top_k=50,
+    max_new_tokens=500,
+    temperature=0.7,
+    top_p=0.9,
+    repetition_penalty=1.1,
     do_sample=True)
-
 prompt = ChatPromptTemplate.from_messages(
     [
         ("system", system_prompt),
@@ -430,6 +433,12 @@ test_retrieval = retriever.invoke("What is HIV?")
 print("Retrieved Documents:", test_retrieval)
 
 app.config['TEMPLATES_AUTO_RELOAD'] = True
+
+@app.before_request
+def track_conversation():
+    session_id = request.headers.get('X-Session-ID', 'default')
+    if session_id not in conversation_memory:
+        conversation_memory[session_id] = deque(maxlen=MAX_HISTORY)
 
 @app.route("/")
 def index():
@@ -503,80 +512,49 @@ def chat():
         if not user_input:
             return jsonify({"error": "Empty message"}), 400
         
+        session_id = data.get("session_id", "default")
         target_lang = data.get("lang", "en")
         
         if target_lang not in LANGUAGE_MAP:
             target_lang = 'en'
         
-        lang_name = LANGUAGE_MAP.get(target_lang, 'english')
-        logger.info(f"Processing request in {lang_name} (code: {target_lang})")
+        history = list(conversation_memory.get(session_id, deque(maxlen=MAX_HISTORY)))
         
-        processed_input = user_input
-        if target_lang != "en":
-            processed_input = translate_text(user_input, 'en', target_lang)
-            logger.debug(f"Translated input: {user_input} -> {processed_input}")
+        processed_input = translate_text(user_input, 'en') if target_lang != "en" else user_input
+        analysis = analyze_symptoms(processed_input)
         
-        disease_info = find_matching_disease(processed_input)
-        if disease_info:
-            docs = retriever.invoke(disease_info['name'])[:1]
-            rag_context = docs[0].page_content[:300] if docs else ""
-            
-            english_response = format_disease_response(disease_info, rag_context)
-            
-            if target_lang != "en":
-                try:
-                    translated_response = translate_text(english_response, target_lang)
-                    return jsonify({"answer": translated_response})
-                except Exception as e:
-                    logger.error(f"Response translation error: {str(e)}")
-                    return jsonify({
-                        "answer": f"(Translation not available) {english_response}",
-                        "warning": f"Full translation to {LANGUAGE_MAP[target_lang]} not available"
-                    })
-            return jsonify({"answer": english_response})
+        response = format_engaging_response(
+            medical_data={
+                'symptoms': analysis['context']['symptoms'],
+                'possible_conditions': analysis['possible_conditions'],
+                'risk_factors': {
+                    'locations': analysis['context']['locations'],
+                    'activities': analysis['context']['activities']
+                }
+            },
+            user_input=user_input,
+            conversation_history=history,
+            llm=llm
+        )
         
-        analysis = analyze_symptoms(processed_input, target_lang)
-        
-        if should_ask_followup(processed_input) and not analysis.get('high_confidence_match', False):
-            followups = generate_followups(processed_input, session.get('chat_history', []))
+        if should_ask_followup(processed_input):
+            followups = generate_followups(processed_input, history)
             if followups:
-                return jsonify({
-                    "action": "ask_followup",
-                    "questions": followups[:2]
-                })
-        
-        top_conditions = [cond['disease'] for cond in analysis['possible_conditions']]
-        context = ""
-        for condition in top_conditions:
-            docs = retriever.invoke(condition)[:1]
-            if docs:
-                context += f"\n\n{condition}:\n{docs[0].page_content[:300]}"
-        
-        if analysis['possible_conditions']:
-            english_response = format_diagnostic_response(analysis, context, target_lang)
-        else:
-            docs = retriever.invoke(processed_input)
-            context = "\n".join(d.page_content[:300] for d in docs[:2])
-            disease_list = ", ".join(medical_disease_data.keys())
-            enhanced_prompt = system_prompt.format(
-                context=context,
-                input=processed_input,
-                disease_list=disease_list
-            )
-            raw_response = llm(enhanced_prompt, max_length=800)[0]['generated_text']
-            english_response = enhance_response(raw_response, llm)
+                response += "\n\nCould you tell me:\n- " + "\n- ".join(followups[:2])
         
         if target_lang != "en":
             try:
-                translated_response = translate_text(english_response, target_lang)
-                final_response = translated_response
+                response = translate_text(response, target_lang)
             except Exception as e:
-                logger.error(f"Failed to translate response to {target_lang}: {str(e)}")
-                final_response = f"(Translation not available) {english_response}"
-        else:
-            final_response = english_response
+                logger.error(f"Translation error: {str(e)}")
+                response += f"\n(Full translation not available in {LANGUAGE_MAP[target_lang]})"
         
-        return jsonify({"answer": final_response})
+        conversation_memory[session_id].append((user_input, response))
+        
+        return jsonify({
+            "answer": response,
+            "session_id": session_id
+        })
         
     except Exception as e:
         logger.error(f"Chat error: {str(e)}", exc_info=True)

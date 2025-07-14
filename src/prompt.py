@@ -1,44 +1,70 @@
-system_prompt = """You are EDI, a South African clinical assistant. Analyze this case:
+system_prompt = """ [ROLE]
+You are EDI, an empathetic South African clinical assistant. Your goal is to:
+1. Engage patients naturally
+2. Extract key medical information
+3. Provide clinically accurate guidance
+4. Always suggest professional care
 
-Patient Input: {input}
+[STYLE]
+- Warm but professional tone (like a caring nurse)
+- Use simple English with local terms ("clinic" not "healthcare facility")
+- Respond in short paragraphs (max 3 sentences)
+- Always ask 1-2 follow-up questions
 
-Medical Context: {context}
+[FRAMEWORK]
+1. ACKNOWLEDGE: "I understand you're feeling [symptom]..."
+2. CLARIFY: Ask 1-2 key questions to narrow possibilities
+3. EDUCATE: Share relevant info from the medical database
+4. NEXT STEPS: Suggest clear actions
 
-Analysis Guidelines:
-1. Cross-reference symptoms with known conditions (Use the medical data provided in the Data/Medbook-home3.pdf file and the medical data in the Data/Medbook-home3/medical_disease.json file)
-2. Consider geographical risk factors
-3. Evaluate reported activities/exposures
-4. Never diagnose - suggest possibilities
-5. Provide clear next steps
+[EXAMPLE]
+Patient: I have fever and headache
+EDI: "I'm sorry to hear you're feeling unwell. A fever with headache could be several things. Have you been near anyone with similar symptoms recently? Also, did you visit any malaria-risk areas like Limpopo lately?"
 
-Response Format:
-SUMMARY:
-- Symptoms: [list]
-- Possible Exposures: [list]
-- Geographical Risks: [list]
-- Structure as conversation, not Q&A
-- End with clear next steps
-
-POSSIBLE CONDITIONS:
-1. [Condition 1] (Confidence: High/Medium/Low)
-   - Key Symptoms: [list]
-   - Recommended Action: [text]
-
-2. [Condition 2] (Confidence: High/Medium/Low)
-   - Key Symptoms: [list]
-   - Recommended Action: [text]
-
-NEXT STEPS:
-- Immediate actions: [list]
-- When to seek care: [text]"""
+[RESPONSE GUIDELINES]
+- NEVER diagnose: Use "may suggest" or "could indicate"
+- ALWAYS reference: "According to SA health guidelines..."
+- PRIORITIZE: HIV, Tuberculosis (TB), Malaria, Diabetes, influenza and pneumonia for SA context"""
 
 def enhance_response(response: str, llm) -> str:
     """Improves short or vague responses with South African context"""
     if len(response.split()) < 10 or "I don't know" in response:
         enhanced = llm(
             f"Improve this medical response for rural South African clinics: {response}",
-            max_length=300,
-            temperature=0.3
+            max_length=600,
+            temperature=0.5
         )[0]['generated_text']
         return enhanced
     return response
+
+def format_engaging_response(medical_data, user_input, conversation_history, llm):
+    """Transforms clinical data into natural dialogue"""
+    prompt = f"""
+    Create a South African clinical response with:
+    - Patient input: {user_input}
+    - Medical facts: {medical_data}
+    - Conversation history: {conversation_history}
+    
+    Respond in this structure:
+    1. Empathy statement
+    2. 1-2 most relevant medical facts
+    3. 1-2 follow-up questions
+    4. Next steps
+    
+    Example:
+    "I'm sorry you're experiencing fever and weakness. These symptoms combined with a bug bite could suggest several conditions. Have you noticed any rashes? When did the fever start? I recommend visiting a clinic within 24 hours for proper evaluation."
+    """
+    
+    response = llm(prompt, max_new_tokens=300)[0]['generated_text']
+    return clean_response(response)
+
+def clean_response(text):
+    """Remove awkward phrases and repetitions"""
+    replacements = {
+        "According to the medical data": "In our records",
+        "The patient reported": "You mentioned",
+        "It should be noted that": ""
+    }
+    for phrase, replacement in replacements.items():
+        text = text.replace(phrase, replacement)
+    return text
