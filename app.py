@@ -19,6 +19,7 @@ from typing import Dict, Any, Optional, List
 from googletrans import Translator
 from datetime import timedelta
 from collections import deque
+from huggingface_hub import InferenceClient
 
 
 logging.basicConfig(level=logging.INFO)
@@ -405,6 +406,12 @@ llm = pipeline(
     top_p=0.9,
     repetition_penalty=1.1,
     do_sample=True)
+
+llm = InferenceClient(
+    model="NousResearch/Hermes-2-Pro-Mistral-7B",
+    token=os.getenv("HUGGINGFACE_API_TOKEN")  # Your HF token
+)
+
 prompt = ChatPromptTemplate.from_messages(
     [
         ("system", system_prompt),
@@ -514,7 +521,6 @@ def chat():
         
         session_id = data.get("session_id", "default")
         target_lang = data.get("lang", "en")
-        
         if target_lang not in LANGUAGE_MAP:
             target_lang = 'en'
         
@@ -523,21 +529,31 @@ def chat():
         processed_input = translate_text(user_input, 'en') if target_lang != "en" else user_input
         analysis = analyze_symptoms(processed_input)
         
-        response = format_engaging_response(
-            medical_data={
-                'symptoms': analysis['context']['symptoms'],
-                'possible_conditions': analysis['possible_conditions'],
-                'risk_factors': {
-                    'locations': analysis['context']['locations'],
-                    'activities': analysis['context']['activities']
-                }
-            },
-            user_input=user_input,
-            conversation_history=history,
-            llm=llm
+        prompt = f"""<|im_start|>system
+        {system_prompt}
+        Conversation History: {history[-2:] if history else "None"}
+        Medical Context: {{
+            Symptoms: {analysis['context']['symptoms']},
+            Risk Factors: {{
+                Locations: {analysis['context']['locations']},
+                Activities: {analysis['context']['activities']}
+            }},
+            Possible Conditions: {[c['disease'] for c in analysis['possible_conditions']]}
+        }}<|im_end|>
+        <|im_start|>user
+        {user_input}<|im_start|>assistant
+        """
+        
+        response = llm.text_generation(
+            prompt,
+            max_new_tokens=350,
+            temperature=0.7,
+            stop_sequences=["<|im_end|>", "\n\n"]
         )
         
-        if should_ask_followup(processed_input):
+        response = clean_response(response.split("<|im_end|>")[0].strip())
+        
+        if should_ask_followup(processed_input) and not response.endswith("?"):
             followups = generate_followups(processed_input, history)
             if followups:
                 response += "\n\nCould you tell me:\n- " + "\n- ".join(followups[:2])
@@ -547,13 +563,17 @@ def chat():
                 response = translate_text(response, target_lang)
             except Exception as e:
                 logger.error(f"Translation error: {str(e)}")
-                response += f"\n(Full translation not available in {LANGUAGE_MAP[target_lang]})"
+                response += f"\n(Translation note: Full response not available in {LANGUAGE_MAP[target_lang]})"
         
         conversation_memory[session_id].append((user_input, response))
         
         return jsonify({
             "answer": response,
-            "session_id": session_id
+            "session_id": session_id,
+            "context": {
+                "symptoms": analysis['context']['symptoms'],
+                "conditions": [c['disease'] for c in analysis['possible_conditions']]
+            }
         })
         
     except Exception as e:
