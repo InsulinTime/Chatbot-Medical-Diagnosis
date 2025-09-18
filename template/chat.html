@@ -4,144 +4,728 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EDI - Medical Assistant</title>
+    <title>EDI - South African Medical Assistant</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-</head>
-<div class="language-selector">
-    <select id="languageSelect">
-        <option value="en">English</option>
-        <option value="zu">Zulu</option>
-        <option value="xh">Xhosa</option>
-        <option value="af">Afrikaans</option>
-        <option value="st">Sesotho</option>
-        <option value="tn">Setswana</option>
-        <option value="ts">Xitsonga</option>
-        <option value="ve">Tshivenda</option>
-        <option value="ss">Swati</option>
-        <option value="nso">Northern Sotho</option>
-        <option value="nr">Southern Ndebele</option>
-    </select>
-</div>
-<body>
-    <div class="chat-container">
-        <!-- Chat Box -->
-        <div class="chat-box" id="chatBox">
-            <div class="chat-box-header">
-                <div class="header-left">
-                    <div class="avatar">
-                        <img src="{{ url_for('static', filename='images/doctor-avatar.png') }}" alt="EDI Avatar">
-                    </div>
-                    <div class="header-info">
-                        <h3>EDI Medical Assistant</h3>
-                        <p class="status"><span class="status-indicator"></span> Online</p>
-                    </div>
-                </div>
-                <div class="header-right">
-                    <button id="printBtn" title="Print Summary"><i class="fas fa-print"></i></button>
-                    <button id="closeChat" title="Minimize"><i class="fas fa-minus"></i></button>
-                </div>
-            </div>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --success: #22c55e;
+            --border-radius: 12px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo img {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+        }
+
+        .logo h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .language-selector {
+            position: relative;
+        }
+
+        .language-selector select {
+            padding: 10px 15px;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            background: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+            height: calc(100vh - 180px);
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .chat-header-info h3 {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .chat-header-info p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 16px;
+            border-radius: 18px;
+            line-height: 1.5;
+            position: relative;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .message.user {
+            background: var(--primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 6px;
+        }
+
+        .message.bot {
+            background: var(--gray-light);
+            color: var(--dark);
+            align-self: flex-start;
+            border-bottom-left-radius: 6px;
+        }
+
+        .message.urgent {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-left: 4px solid var(--danger);
+        }
+
+        .message-time {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        .welcome-message {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            padding: 24px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .welcome-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 16px;
+        }
+
+        .welcome-message h4 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: var(--primary-dark);
+        }
+
+        .welcome-message p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .quick-btn {
+            padding: 12px;
+            background: white;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quick-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .quick-btn i {
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid var(--gray-light);
+            background: white;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .action-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .action-btn.secondary {
+            background: var(--gray-light);
+            color: var(--dark);
+        }
+
+        .action-btn.secondary:hover {
+            background: var(--gray);
+            color: white;
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 24px;
+        }
+
+        .sidebar-section h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feature-card {
+            background: var(--light);
+            padding: 16px;
+            border-radius: var(--border-radius);
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        .feature-card h4 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .emergency-card {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: 2px solid var(--danger);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .emergency-card h3 {
+            color: var(--danger);
+            margin-bottom: 12px;
+        }
+
+        .emergency-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            margin-top: 12px;
+        }
+
+        .emergency-btn:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .modal-option {
+            padding: 16px;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-option:hover {
+            border-color: var(--primary);
+            background: var(--light);
+        }
+
+        .modal-option i {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
             
-            <div class="chat-box-body" id="chatMessages">
-                <!-- Welcome message with quick action buttons -->
-                <div class="chat-box-body-receive welcome-message animate__animated animate__fadeIn">
-                    <div class="welcome-content">
+            .sidebar {
+                display: none;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 16px;
+            background: var(--gray-light);
+            border-radius: 18px;
+            align-self: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--gray);
+            border-radius: 50%;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        .symptom-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .symptom-tag {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='images/sa-health-logo.png') }}" alt="SA Health Logo">
+                <h1>EDI Medical Assistant</h1>
+            </div>
+            <div class="language-selector">
+                <select id="languageSelect">
+                    <option value="en">English</option>
+                    <option value="zu">Zulu</option>
+                    <option value="xh">Xhosa</option>
+                    <option value="af">Afrikaans</option>
+                    <option value="st">Sesotho</option>
+                    <option value="tn">Setswana</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="chat-avatar">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="chat-header-info">
+                        <h3>EDI Medical Assistant</h3>
+                        <p><i class="fas fa-circle" style="color: var(--success); font-size: 8px;"></i> Online - Ready to help</p>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    <div class="welcome-message">
                         <img src="{{ url_for('static', filename='images/sa-health-logo.png') }}" alt="SA Health" class="welcome-logo">
                         <h4>Hello! I'm EDI, your South African Health Assistant</h4>
-                        <p>How can I help you today? You can describe your symptoms, ask about medications, or get information about local clinics.</p>
+                        <p>I'm here to help you understand your symptoms, find healthcare resources, and get the right medical guidance. How can I assist you today?</p>
                         
                         <div class="quick-actions">
                             <button class="quick-btn" data-prompt="I have a headache and fever">
-                                <i class="fas fa-head-side-cough"></i> Fever & Headache
+                                <i class="fas fa-temperature-high"></i>
+                                <span>Fever & Headache</span>
                             </button>
-                            <button class="quick-btn" data-prompt="I have stomach pain and diarrhea">
-                                <i class="fas fa-stomach"></i> Stomach Issues
+                            <button class="quick-btn" data-prompt="I have stomach pain">
+                                <i class="fas fa-stomach"></i>
+                                <span>Stomach Pain</span>
                             </button>
                             <button class="quick-btn" data-prompt="Where is the nearest clinic?">
-                                <i class="fas fa-map-marker-alt"></i> Find Clinic
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Find Clinic</span>
+                            </button>
+                            <button class="quick-btn" data-prompt="What are HIV symptoms?">
+                                <i class="fas fa-virus"></i>
+                                <span>HIV Information</span>
                             </button>
                         </div>
                     </div>
-                    <span>Just now</span>
+                </div>
+
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <div class="input-wrapper">
+                        <button class="action-btn secondary" id="addExtra">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <input type="text" class="chat-input" id="userInput" placeholder="Describe your symptoms or ask a question...">
+                        <button class="action-btn secondary" id="voiceBtn">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button class="action-btn" id="sendButton">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-            
-            <div class="chat-box-footer">
-                <button id="addExtra" title="More options"><i class="fas fa-ellipsis-h"></i></button>
-                <div class="input-container">
-                    <input id="userInput" placeholder="Describe your symptoms or ask a question..." type="text" />
-                    <button id="voiceBtn" title="Voice input"><i class="fas fa-microphone"></i></button>
+
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-medkit"></i> Quick Access</h3>
+                    <div class="feature-card" id="symptomCheck">
+                        <h4>Symptom Checker</h4>
+                        <p>Guided assessment of your symptoms</p>
+                    </div>
+                    <div class="feature-card" id="bodyMap">
+                        <h4>Body Map</h4>
+                        <p>Select body areas where you feel pain</p>
+                    </div>
+                    <div class="feature-card" id="findClinic">
+                        <h4>Find Clinic</h4>
+                        <p>Locate healthcare facilities near you</p>
+                    </div>
                 </div>
-                <button id="sendButton" class="send" title="Send"><i class="fas fa-paper-plane"></i></button>
+
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-history"></i> Recent Topics</h3>
+                    <div class="feature-card">
+                        <h4>Malaria Prevention</h4>
+                        <p>Important for travelers</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>TB Symptoms</h4>
+                        <p>Know the signs</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>HIV Testing</h4>
+                        <p>Free clinics available</p>
+                    </div>
+                </div>
+
+                <div class="emergency-card">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Emergency</h3>
+                    <p>For life-threatening emergencies, call immediately:</p>
+                    <button class="emergency-btn" id="emergencyHelp">
+                        Call 10177 (Ambulance)
+                    </button>
+                </div>
             </div>
         </div>
-        
-        <div class="chat-button animate__animated animate__bounceIn" id="chatButton">
-            <i class="fas fa-comment-medical"></i>
-            <span class="notification-badge">1</span>
-        </div>
-        
-        <div class="modal" id="optionsModal">
-            <div class="modal-content animate__animated animate__fadeInUp">
-                <span class="modal-close-button">&times;</span>
+    </div>
+
+    <div class="modal" id="optionsModal">
+        <div class="modal-content">
+            <div class="modal-header">
                 <h3><i class="fas fa-medkit"></i> Health Resources</h3>
-                <div class="modal-options">
-                    <button class="modal-btn" id="symptomCheck">
-                        <i class="fas fa-stethoscope"></i> 
-                        <div>
-                            <strong>Symptom Checker</strong>
-                            <small>Start guided symptom assessment</small>
-                        </div>
-                    </button>
-                    <button class="modal-btn" id="findClinic">
-                        <i class="fas fa-clinic-medical"></i>
-                        <div>
-                            <strong>Find Clinic</strong>
-                            <small>Locate nearest healthcare facility</small>
-                        </div>
-                    </button>
-                    <button class="modal-btn" id="emergencyHelp">
-                        <i class="fas fa-ambulance"></i>
-                        <div>
-                            <strong>Emergency Help</strong>
-                            <small>Immediate medical assistance</small>
-                        </div>
-                    </button>
-                    <button class="modal-btn" id="medicationInfo">
-                        <i class="fas fa-pills"></i>
-                        <div>
-                            <strong>Medication Info</strong>
-                            <small>Learn about medicines</small>
-                        </div>
-                    </button>
-                    <button class="modal-btn" id="printSummary">
-                        <i class="fas fa-file-medical"></i>
-                        <div>
-                            <strong>Print Summary</strong>
-                            <small>Get a copy for your doctor</small>
-                        </div>
-                    </button>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-options">
+                <div class="modal-option" id="modalSymptomCheck">
+                    <i class="fas fa-stethoscope"></i>
+                    <div>
+                        <strong>Symptom Checker</strong>
+                        <p>Start guided symptom assessment</p>
+                    </div>
                 </div>
-                
-                <div class="modal-footer">
-                    <p>For life-threatening emergencies, call <strong>10177</strong> (Ambulance) or <strong>112</strong> (Cell phone emergency)</p>
+                <div class="modal-option" id="modalBodyMap">
+                    <i class="fas fa-child"></i>
+                    <div>
+                        <strong>3D Body Map</strong>
+                        <p>Click body regions to indicate symptoms</p>
+                    </div>
+                </div>
+                <div class="modal-option" id="modalFindClinic">
+                    <i class="fas fa-clinic-medical"></i>
+                    <div>
+                        <strong>Find Clinic</strong>
+                        <p>Locate nearest healthcare facility</p>
+                    </div>
+                </div>
+                <div class="modal-option" id="modalEmergencyHelp">
+                    <i class="fas fa-ambulance"></i>
+                    <div>
+                        <strong>Emergency Help</strong>
+                        <p>Immediate medical assistance</p>
+                    </div>
+                </div>
+                <div class="modal-option" id="modalMedicationInfo">
+                    <i class="fas fa-pills"></i>
+                    <div>
+                        <strong>Medication Info</strong>
+                        <p>Learn about medicines</p>
+                    </div>
+                </div>
+                <div class="modal-option" id="modalPrintSummary">
+                    <i class="fas fa-file-medical"></i>
+                    <div>
+                        <strong>Print Summary</strong>
+                        <p>Get a copy for your doctor</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="modal" id="emergencyModal">
-        <div class="modal-content emergency-content animate__animated animate__headShake">
-            <h3><i class="fas fa-exclamation-triangle"></i> Emergency Assistance</h3>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Emergency Assistance</h3>
+                <button class="modal-close">&times;</button>
+            </div>
             <div class="emergency-actions">
                 <button class="emergency-btn" id="callAmbulance">
                     <i class="fas fa-ambulance"></i> Call Ambulance (10177)
                 </button>
                 <button class="emergency-btn" id="nearestHospital">
-                    <i class="fas fa-hospital"></i> Nearest Hospital
+                    <i class="fas fa-hospital"></i> Find Nearest Hospital
                 </button>
                 <button class="emergency-btn" id="poisonControl">
                     <i class="fas fa-biohazard"></i> Poison Control (0861 555 777)
@@ -156,30 +740,134 @@
                     <li>Sudden weakness or numbness</li>
                     <li>Loss of consciousness</li>
                     <li>Severe allergic reactions</li>
-                    <li> Severe pain anywhere on your body</li>
-                    <li>Suicidal thoughts</li>
                 </ul>
             </div>
-            <button class="close-emergency" id="closeEmergency">Cancel</button>
         </div>
     </div>
 
-    <div class="modal" id="symptomCheckerModal">
-        <div class="modal-content">
-            <span class="modal-close-button">&times;</span>
-            <h3><i class="fas fa-stethoscope"></i> Symptom Checker</h3>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.getElementById('chatMessages');
+            const userInput = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+            const voiceBtn = document.getElementById('voiceBtn');
+            const typingIndicator = document.getElementById('typingIndicator');
+            const optionsModal = document.getElementById('optionsModal');
+            const emergencyModal = document.getElementById('emergencyModal');
+            const addExtraBtn = document.getElementById('addExtra');
+            const emergencyHelpBtn = document.getElementById('emergencyHelp');
+            const modalCloseButtons = document.querySelectorAll('.modal-close');
             
-            <div id="symptomSteps">
-                <!-- Steps will be injected here by JavaScript -->
-            </div>
+            const quickButtons = document.querySelectorAll('.quick-btn');
+            quickButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    userInput.value = button.getAttribute('data-prompt');
+                    sendMessage();
+                });
+            });
             
-            <div class="symptom-nav">
-                <button id="prevSymptom" disabled>Previous</button>
-                <button id="nextSymptom">Next</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const id = card.id;
+                    if (id === 'symptomCheck') {
+                        openSymptomChecker();
+                    } else if (id === 'bodyMap') {
+                        window.location.href = "/body_map";
+                    } else if (id === 'findClinic') {
+                        findClinic();
+                    }
+                });
+            });
+            
+            addExtraBtn.addEventListener('click', () => {
+                optionsModal.style.display = 'flex';
+            });
+            
+            emergencyHelpBtn.addEventListener('click', () => {
+                emergencyModal.style.display = 'flex';
+            });
+            
+            modalCloseButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    optionsModal.style.display = 'none';
+                    emergencyModal.style.display = 'none';
+                });
+            });
+            
+            function sendMessage() {
+                const message = userInput.value.trim();
+                if (message === '') return;
+                
+                addMessage(message, 'user');
+                userInput.value = '';
+                
+                typingIndicator.style.display = 'flex';
+                
+                setTimeout(() => {
+                    typingIndicator.style.display = 'none';
+                    simulateAIResponse(message);
+                }, 1500);
+            }
+            
+            function addMessage(text, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message', sender);
+                
+                const messageText = document.createElement('div');
+                messageText.textContent = text;
+                
+                const messageTime = document.createElement('div');
+                messageTime.classList.add('message-time');
+                messageTime.textContent = new Date().toLocaleTimeString();
+                
+                messageDiv.appendChild(messageText);
+                messageDiv.appendChild(messageTime);
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            function simulateAIResponse(userMessage) {
+                let response = '';
+                const lowerMessage = userMessage.toLowerCase();
+                
+                if (lowerMessage.includes('headache') && lowerMessage.includes('fever')) {
+                    response = "Headache with fever can indicate several conditions. Have you recently traveled to malaria-risk areas? How long have you had these symptoms?";
+                } else if (lowerMessage.includes('stomach') || lowerMessage.includes('abdominal')) {
+                    response = "Abdominal pain can have various causes. Can you describe the pain? Is it sharp, dull, or cramping? Have you noticed any changes in bowel movements?";
+                } else if (lowerMessage.includes('clinic') || lowerMessage.includes('hospital')) {
+                    response = "I can help you find healthcare facilities. Please share your location or area so I can find clinics near you.";
+                } else if (lowerMessage.includes('hiv')) {
+                    response = "HIV symptoms may include fever, fatigue, swollen lymph nodes, and weight loss. Free testing and counseling are available at all public clinics in South Africa.";
+                } else {
+                    response = "Thank you for sharing. To better assist you, could you provide more details about your symptoms? For example, when they started, severity, and any other symptoms you're experiencing.";
+                }
+                
+                addMessage(response, 'bot');
+            }
+            
+            sendButton.addEventListener('click', sendMessage);
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            function openSymptomChecker() {
+                addMessage("I'm opening the symptom checker. This will help us understand your symptoms better.", 'bot');
+                optionsModal.style.display = 'none';
+            }
+            
+            function findClinic() {
+                addMessage("Let me help you find healthcare facilities. Please enable location services or tell me your area.", 'bot');
+                optionsModal.style.display = 'none';
+            }
+            
+            setTimeout(() => {
+                addMessage("Welcome! I'm EDI, your medical assistant. How can I help you today? You can describe symptoms, ask questions, or use the quick buttons below.", 'bot');
+            }, 1000);
+        });
+    </script>
 </body>
 </html>

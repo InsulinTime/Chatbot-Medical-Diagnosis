@@ -432,7 +432,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if (voiceBtn) {
-        voiceBtn.addEventListener('click', function() {
+        voiceBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
             if (mediaRecorder && mediaRecorder.state !== 'inactive') {
                 toggleRecording();
             } else if (isSpeechRecognitionSupported && !mediaRecorder) {
@@ -451,8 +453,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
                     removeTypingIndicator();
                 }
+            } else {
+                addMessage('Voice input is not available in your browser.', 'receive');
             }
-        });
+        }, { once: false });
     }
     
     chatButton.addEventListener('click', function() {
@@ -622,6 +626,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function getSummary() {
+        addTypingIndicator('Generating summary...');
+        
         fetch('/get_conversation_summary', {
             method: 'POST',
             headers: {
@@ -633,9 +639,17 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
+            removeTypingIndicator();
             if (data.success) {
                 displaySummaryModal(data.report);
+            } else {
+                addMessage('Could not generate summary. Please try again.', 'receive');
             }
+        })
+        .catch(error => {
+            removeTypingIndicator();
+            console.error('Summary error:', error);
+            addMessage('Error generating summary. Please try again.', 'receive');
         });
     }
 
@@ -663,7 +677,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.printReport = function(encodedReport) {
         try {
-            const report = atob(encodedReport);
+            const report = decodeURIComponent(atob(encodedReport));
             const printWindow = window.open('', '', 'height=600,width=800');
             printWindow.document.write('<html><head><title>Medical Summary</title>');
             printWindow.document.write('<style>body { font-family: Arial; padding: 20px; } pre { white-space: pre-wrap; }</style>');
@@ -679,10 +693,6 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Unable to print. Please try again.');
         }
     }
-
-    initVoiceRecording();
-    document.getElementById('voiceBtn').addEventListener('click', toggleRecording);
-    document.getElementById('printBtn').addEventListener('click', getSummary);
     
     async function sendMessage() {
         const message = userInput.value.trim();
@@ -852,6 +862,24 @@ document.addEventListener('DOMContentLoaded', function() {
         
         return html;
     }
+
+    document.getElementById('bodyMap').addEventListener('click', function() {
+        optionsModal.classList.remove('active');
+        
+        // Create modal for 3D body
+        const bodyModal = document.createElement('div');
+        bodyModal.className = 'modal show';
+        bodyModal.id = 'bodyMapModal';
+        bodyModal.innerHTML = `
+            <div class="modal-content" style="max-width: 650px;">
+                <span class="modal-close-button" onclick="document.getElementById('bodyMapModal').remove()">&times;</span>
+                <h3><i class="fas fa-child"></i> Interactive Body Symptom Map</h3>
+                <p>Click on body parts to indicate where you're experiencing symptoms</p>
+                <iframe src="/body_map" width="100%" height="600" frameborder="0"></iframe>
+            </div>
+        `;
+        document.body.appendChild(bodyModal);
+    });
     
     sendButton.addEventListener('click', sendMessage);
     

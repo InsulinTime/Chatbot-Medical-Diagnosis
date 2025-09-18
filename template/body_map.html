@@ -1,0 +1,762 @@
+<!--this file is template/body_map.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Body Symptom Mapper - EDI Medical Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --success: #22c55e;
+            --border-radius: 12px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo img {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+        }
+
+        .logo h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .back-button:hover {
+            border-color: var(--primary);
+            transform: translateX(-4px);
+        }
+
+        .body-map-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .body-map-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .body-map-header h2 {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .body-map-header p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .body-map-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 24px;
+        }
+
+        .body-canvas-container {
+            position: relative;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #bodyCanvas {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: var(--border-radius);
+        }
+
+        .body-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .symptoms-panel {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .symptoms-panel h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selected-region {
+            background: white;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .selected-region h4 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--dark);
+        }
+
+        .symptom-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .symptom-item {
+            padding: 12px;
+            background: white;
+            border-radius: var(--border-radius);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 2px solid transparent;
+        }
+
+        .symptom-item:hover {
+            border-color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        .symptom-item.selected {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .symptom-item i {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            padding: 12px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.secondary {
+            background: var(--gray-light);
+            color: var(--dark);
+        }
+
+        .action-btn.secondary:hover {
+            background: var(--gray);
+            color: white;
+        }
+
+        .body-region {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .body-region:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .body-region.selected {
+            background: rgba(239, 68, 68, 0.5);
+            border-color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .symptom-overlay {
+            position: absolute;
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            display: none;
+            max-width: 300px;
+        }
+
+        .symptom-overlay h4 {
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+
+        .symptom-options {
+            display: grid;
+            gap: 8px;
+        }
+
+        .symptom-option {
+            padding: 8px 12px;
+            background: var(--light);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .symptom-option:hover {
+            background: var(--gray-light);
+        }
+
+        .close-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .selected-symptoms {
+            margin-top: 20px;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .selected-symptoms h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .symptom-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .symptom-tag {
+            background: var(--primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .symptom-tag i {
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .body-map-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .body-canvas-container {
+                height: 400px;
+            }
+            
+            .symptoms-panel {
+                height: auto;
+            }
+        }
+
+        .body-regions {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        #head-region {
+            width: 80px;
+            height: 80px;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #chest-region {
+            width: 120px;
+            height: 100px;
+            top: 130px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #abdomen-region {
+            width: 110px;
+            height: 90px;
+            top: 240px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #left-arm-region {
+            width: 50px;
+            height: 150px;
+            top: 140px;
+            left: 130px;
+        }
+
+        #right-arm-region {
+            width: 50px;
+            height: 150px;
+            top: 140px;
+            right: 130px;
+        }
+
+        #left-leg-region {
+            width: 60px;
+            height: 180px;
+            top: 340px;
+            left: 160px;
+        }
+
+        #right-leg-region {
+            width: 60px;
+            height: 180px;
+            top: 340px;
+            right: 160px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='images/sa-health-logo.png') }}" alt="SA Health Logo">
+                <h1>EDI Body Symptom Mapper</h1>
+            </div>
+            <a href="/" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Back to Chat
+            </a>
+        </div>
+
+        <div class="body-map-container">
+            <div class="body-map-header">
+                <h2><i class="fas fa-child"></i> 3D Body Symptom Mapper</h2>
+                <p>Select body regions where you're experiencing symptoms. Click on a body part to specify your symptoms.</p>
+            </div>
+
+            <div class="body-map-content">
+                <div class="body-canvas-container">
+                    <div class="body-regions">
+                        <img id="bodyCanvas" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjYwMCIgdmlld0JveD0iMCAwIDQwMCA2MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNjAwIiByeD0iMjAiIGZpbGw9IiM2NjdlZWEiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjEwMCIgcj0iNDAiIGZpbGw9IiM2NjdlZWEiIGZpbGwtb3BhY2l0eT0iMC4zIiBzdHJva2U9IiM2NjdlZWEiIHN0cm9rZS13aWR0aD0iMiIvPgo8cmVjdCB4PSIxNjAiIHk9IjE0MCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjEwMCIgcng9IjEwIiBmaWxsPSIjNjY3ZWVhIiBmaWxsLW9wYWNpdHk9IjAuMyIgc3Ryb2tlPSIjNjY3ZWVhIiBzdHJva2Utd2lkdGg9IjIiLz4KPHJlY3QgeD0iMTYwIiB5PSIyNDAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIxMDAiIHJ4PSIxMCIgZmlsbD0iIzY2N2VlYSIgZmlsbC1vcGFjaXR5PSIwLjMiIHN0cm9rZT0iIzY2N2VlYSIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxyZWN0IHg9IjEyMCIgeT0iMTUwIiB3aWR0aD0iNDAiIGhlaWdodD0iMTUwIiByeD0iMjAiIGZpbGw9IiM2NjdlZWEiIGZpbGwtb3BhY2l0eT0iMC4zIiBzdHJva2U9IiM2NjdlZWEiIHN0cm9rZS13aWR0aD0iMiIvPgo8cmVjdCB4PSIyNDAiIHk9IjE1MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjE1MCIgcng9IjIwIiBmaWxsPSIjNjY3ZWVhIiBmaWxsLW9wYWNpdHk9IjAuMyIgc3Ryb2tlPSIjNjY3ZWVhIiBzdHJva2Utd2lkdGg9IjIiLz4KPHJlY3QgeD0iMTYwIiB5PSIzNDAiIHdpZHRoPSI0MCIgaGVpZ2h0PSIxNjAiIHJ4PSIyMCIgZmlsbD0iIzY2N2VlYSIgZmlsbC1vcGFjaXR5PSIwLjMiIHN0cm9rZT0iIzY2N2VlYSIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxyZWN0IHg9IjIwMCIgeT0iMzQwIiB3aWR0aD0iNDAiIGhlaWdodD0iMTYwIiByeD0iMjAiIGZpbGw9IiM2NjdlZWEiIGZpbGwtb3BhY2l0eT0iMC4zIiBzdHJva2U9IiM2NjdlZWEiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4=" alt="Human Body Outline">
+                        
+                        <div class="body-region" id="head-region" data-region="head">Head</div>
+                        <div class="body-region" id="chest-region" data-region="chest">Chest</div>
+                        <div class="body-region" id="abdomen-region" data-region="abdomen">Abdomen</div>
+                        <div class="body-region" id="left-arm-region" data-region="left-arm">Left Arm</div>
+                        <div class="body-region" id="right-arm-region" data-region="right-arm">Right Arm</div>
+                        <div class="body-region" id="left-leg-region" data-region="left-leg">Left Leg</div>
+                        <div class="body-region" id="right-leg-region" data-region="right-leg">Right Leg</div>
+                    </div>
+
+                    <div class="symptom-overlay" id="symptomOverlay">
+                        <button class="close-overlay">&times;</button>
+                        <h4>Select Symptoms for <span id="selectedRegionName">Head</span></h4>
+                        <div class="symptom-options" id="symptomOptions">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="symptoms-panel">
+                    <h3><i class="fas fa-stethoscope"></i> Symptoms Selection</h3>
+                    
+                    <div class="selected-region">
+                        <h4>Selected Body Region</h4>
+                        <p id="currentRegion">None selected</p>
+                    </div>
+                    
+                    <div class="symptom-list" id="symptomList">
+                        <div class="symptom-item" data-symptom="pain">
+                            <i class="fas fa-band-aid"></i>
+                            <span>Pain</span>
+                        </div>
+                        <div class="symptom-item" data-symptom="swelling">
+                            <i class="fas fa-hand-paper"></i>
+                            <span>Swelling</span>
+                        </div>
+                        <div class="symptom-item" data-symptom="redness">
+                            <i class="fas fa-circle"></i>
+                            <span>Redness</span>
+                        </div>
+                        <div class="symptom-item" data-symptom="numbness">
+                            <i class="fas fa-hand-paper"></i>
+                            <span>Numbness</span>
+                        </div>
+                        <div class="symptom-item" data-symptom="itching">
+                            <i class="fas fa-hand-point-up"></i>
+                            <span>Itching</span>
+                        </div>
+                        <div class="symptom-item" data-symptom="rash">
+                            <i class="fas fa-allergies"></i>
+                            <span>Rash</span>
+                        </div>
+                        <div class="symptom-item" data-symptom="stiffness">
+                            <i class="fas fa-compress-alt"></i>
+                            <span>Stiffness</span>
+                        </div>
+                        <div class="symptom-item" data-symptom="weakness">
+                            <i class="fas fa-wind"></i>
+                            <span>Weakness</span>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="action-btn secondary" id="resetSelection">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                        <button class="action-btn primary" id="analyzeSymptoms">
+                            <i class="fas fa-search"></i> Analyze
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="body-controls">
+                <button class="control-btn" id="rotateLeft">
+                    <i class="fas fa-undo"></i> Rotate Left
+                </button>
+                <button class="control-btn" id="rotateRight">
+                    <i class="fas fa-redo"></i> Rotate Right
+                </button>
+                <button class="control-btn" id="toggleView">
+                    <i class="fas fa-exchange-alt"></i> Front/Back
+                </button>
+                <button class="control-btn" id="resetView">
+                    <i class="fas fa-sync"></i> Reset View
+                </button>
+            </div>
+        </div>
+
+        <div class="selected-symptoms">
+            <h3><i class="fas fa-list-check"></i> Selected Symptoms</h3>
+            <div class="symptom-tags" id="selectedSymptoms">
+                <div class="symptom-tag">No symptoms selected yet</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const bodyRegions = document.querySelectorAll('.body-region');
+            const symptomItems = document.querySelectorAll('.symptom-item');
+            const symptomOverlay = document.getElementById('symptomOverlay');
+            const closeOverlay = document.querySelector('.close-overlay');
+            const selectedRegionName = document.getElementById('selectedRegionName');
+            const currentRegion = document.getElementById('currentRegion');
+            const selectedSymptoms = document.getElementById('selectedSymptoms');
+            const resetSelection = document.getElementById('resetSelection');
+            const analyzeSymptoms = document.getElementById('analyzeSymptoms');
+            const symptomOptions = document.getElementById('symptomOptions');
+            
+            let selectedRegion = null;
+            let symptoms = {};
+            const regionSymptoms = {
+                'head': ['Headache', 'Dizziness', 'Vision problems', 'Ear pain', 'Toothache', 'Jaw pain'],
+                'chest': ['Chest pain', 'Shortness of breath', 'Heart palpitations', 'Cough', 'Chest tightness'],
+                'abdomen': ['Stomach pain', 'Nausea', 'Bloating', 'Diarrhea', 'Constipation', 'Indigestion'],
+                'left-arm': ['Pain', 'Numbness', 'Tingling', 'Weakness', 'Swelling'],
+                'right-arm': ['Pain', 'Numbness', 'Tingling', 'Weakness', 'Swelling'],
+                'left-leg': ['Pain', 'Numbness', 'Tingling', 'Weakness', 'Swelling', 'Joint pain'],
+                'right-leg': ['Pain', 'Numbness', 'Tingling', 'Weakness', 'Swelling', 'Joint pain']
+            };
+            
+            updateSelectedSymptoms();
+            
+            bodyRegions.forEach(region => {
+                region.addEventListener('click', () => {
+                    bodyRegions.forEach(r => r.classList.remove('selected'));
+                    
+                    region.classList.add('selected');
+                    selectedRegion = region.dataset.region;
+                    currentRegion.textContent = region.textContent;
+                    
+                    showSymptomOverlay(region.dataset.region);
+                });
+            });
+            
+            symptomItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    if (!selectedRegion) {
+                        alert('Please select a body region first.');
+                        return;
+                    }
+                    
+                    item.classList.toggle('selected');
+                    const symptom = item.dataset.symptom;
+                    
+                    if (!symptoms[selectedRegion]) {
+                        symptoms[selectedRegion] = [];
+                    }
+                    
+                    if (item.classList.contains('selected')) {
+                        if (!symptoms[selectedRegion].includes(symptom)) {
+                            symptoms[selectedRegion].push(symptom);
+                        }
+                    } else {
+                        symptoms[selectedRegion] = symptoms[selectedRegion].filter(s => s !== symptom);
+                    }
+                    
+                    updateSelectedSymptoms();
+                });
+            });
+            
+            closeOverlay.addEventListener('click', () => {
+                symptomOverlay.style.display = 'none';
+            });
+            
+            resetSelection.addEventListener('click', () => {
+                symptoms = {};
+                bodyRegions.forEach(r => r.classList.remove('selected'));
+                symptomItems.forEach(i => i.classList.remove('selected'));
+                selectedRegion = null;
+                currentRegion.textContent = 'None selected';
+                updateSelectedSymptoms();
+            });
+            
+            analyzeSymptoms.addEventListener('click', () => {
+                if (Object.keys(symptoms).length === 0) {
+                    alert('Please select at least one symptom to analyze.');
+                    return;
+                }
+                
+                const symptomData = [];
+                for (const [region, regionSymptoms] of Object.entries(symptoms)) {
+                    for (const symptom of regionSymptoms) {
+                        symptomData.push(`${symptom} in ${region}`);
+                    }
+                }
+                
+                alert(`Sending for analysis: ${symptomData.join(', ')}`);
+                
+                window.location.href = `/?symptoms=${encodeURIComponent(symptomData.join(','))}`;
+            });
+            
+            document.getElementById('rotateLeft').addEventListener('click', () => {
+                alert('Rotating body view left');
+            });
+            
+            document.getElementById('rotateRight').addEventListener('click', () => {
+                alert('Rotating body view right');
+            });
+            
+            document.getElementById('toggleView').addEventListener('click', () => {
+                alert('Toggling between front and back view');
+            });
+            
+            document.getElementById('resetView').addEventListener('click', () => {
+                alert('Resetting view to default');
+            });
+            
+            function showSymptomOverlay(region) {
+                selectedRegionName.textContent = region;
+                
+                symptomOptions.innerHTML = '';
+                
+                if (regionSymptoms[region]) {
+                    regionSymptoms[region].forEach(symptom => {
+                        const option = document.createElement('div');
+                        option.className = 'symptom-option';
+                        option.textContent = symptom;
+                        option.addEventListener('click', () => {
+                            if (!symptoms[region]) {
+                                symptoms[region] = [];
+                            }
+                            
+                            if (!symptoms[region].includes(symptom)) {
+                                symptoms[region].push(symptom);
+                            } else {
+                                symptoms[region] = symptoms[region].filter(s => s !== symptom);
+                                option.classList.remove('selected');
+                            }
+                            
+                            updateSelectedSymptoms();
+                            symptomOverlay.style.display = 'none';
+                        });
+                        
+                        symptomOptions.appendChild(option);
+                    });
+                }
+                
+                symptomOverlay.style.display = 'block';
+            }
+            
+            function updateSelectedSymptoms() {
+                selectedSymptoms.innerHTML = '';
+                
+                if (Object.keys(symptoms).length === 0) {
+                    selectedSymptoms.innerHTML = '<div class="symptom-tag">No symptoms selected yet</div>';
+                    return;
+                }
+                
+                for (const [region, regionSymptoms] of Object.entries(symptoms)) {
+                    for (const symptom of regionSymptoms) {
+                        const tag = document.createElement('div');
+                        tag.className = 'symptom-tag';
+                        tag.innerHTML = `
+                            ${symptom} (${region})
+                            <i class="fas fa-times" data-region="${region}" data-symptom="${symptom}"></i>
+                        `;
+                        
+                        tag.querySelector('i').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const region = e.target.dataset.region;
+                            const symptom = e.target.dataset.symptom;
+                            
+                            symptoms[region] = symptoms[region].filter(s => s !== symptom);
+                            if (symptoms[region].length === 0) {
+                                delete symptoms[region];
+                            }
+                            
+                            updateSelectedSymptoms();
+                        });
+                        
+                        selectedSymptoms.appendChild(tag);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -115,7 +115,7 @@ def find_matching_disease(user_input: str) -> Optional[Dict[str, Any]]:
     
     return None
 
-def analyze_symptoms(user_input: str, lang: str = "en") -> Dict:
+def analyze_symptoms(user_input: str, lang: str = "en", input_method: str = "text") -> Dict:
     """Enhanced symptom analysis with better pattern matching"""
     context = {
         'symptoms': [],
@@ -138,6 +138,46 @@ def analyze_symptoms(user_input: str, lang: str = "en") -> Dict:
         'sore throat': ['throat', 'swallow hurts'],
         'diarrhea': ['diarrhea', 'loose stool', 'stomach runs'],
         'nausea': ['nausea', 'feel sick', 'vomit', 'throw up'],
+        'abdominal pain': ['stomach pain', 'belly ache', 'abdominal pain'],
+        'chills': ['chills', 'shivering', 'cold'],
+        'sweating': ['sweat', 'sweating', 'night sweats'],
+        'shortness of breath': ['shortness of breath', 'breathless', 'difficulty breathing'],
+        'chest pain': ['chest pain', 'chest hurts', 'pain in chest'],
+        'dizziness': ['dizzy', 'lightheaded', 'faint'],
+        'bleeding': ['bleeding', 'blood', 'bleed'],
+        'itching': ['itchy', 'itching', 'scratchy'],
+        'swelling': ['swelling', 'swollen', 'puffy'],
+        'weight loss': ['weight loss', 'losing weight', 'lost weight', 'unexplained weight loss', 'losing weight without trying'],
+        'night sweats': ['night sweats', 'sweat at night'],
+        'confusion': ['confused', 'confusion', 'disoriented'],
+        'seizures': ['seizures', 'convulsions', 'fits'],
+        'loss of consciousness': ['unconscious', 'passed out', 'blackout'],
+        'joint pain': ['joint pain', 'joints hurting', 'joint aches'],
+        'stiffness': ['stiff', 'stiffness', 'hard to move'],
+        'numbness': ['numb', 'numbness', 'no feeling'],
+        'vision changes': ['vision changes', 'blurred vision', 'double vision'],
+        'hearing loss': ['hearing loss', 'deaf', 'hard of hearing'],
+        'ear pain': ['ear pain', 'earache', 'ear hurts'],
+        'toothache': ['toothache', 'tooth pain', 'tooth hurts'],
+        'back pain': ['back pain', 'back hurts', 'backache'],
+        'leg pain': ['leg pain', 'leg hurts', 'legache'],
+        'swollen lymph nodes': ['swollen lymph nodes', 'swollen glands', 'lumps in neck', 'lumps in armpit'],
+        'loss of appetite': ['loss of appetite', 'not hungry', 'no appetite'],
+        'coughing blood': ['coughing blood', 'blood in cough', 'coughing up blood'],
+        'persistent cough': ['persistent cough', 'long cough', 'cough lasting'],
+        'night sweats': ['night sweats', 'sweating at night'],
+        'unexplained weight loss': ['unexplained weight loss', 'losing weight without trying'],
+        'body aches': ['body aches', 'body pain', 'aches all over'],
+        'chest tightness': ['chest tightness', 'tight chest', 'chest feels tight'],
+        'wheezing': ['wheezing', 'whistling sound when breathing', 'wheeze'],
+        'loss of smell': ['loss of smell', 'cant smell', 'no sense of smell'],
+        'loss of taste': ['loss of taste', 'cant taste', 'no sense of taste'],
+        'runny nose': ['runny nose', 'nose is runny', 'nasal discharge'],
+        'sneezing': ['sneezing', 'sneeze', 'sneezes'],
+        'fever with chills': ['hot and cold', 'shivering fever', 'fever with shaking'],
+        'jaundice': ['yellow eyes', 'yellow skin', 'jaundice'],
+        'bloody diarrhea': ['bloody diarrhea', 'blood in stool', 'bloody stool'],
+        'persistent vomiting': ['persistent vomiting', 'vomiting a lot', 'throwing up a lot'],
     }
     
     for symptom, keywords in symptom_keywords.items():
@@ -145,16 +185,35 @@ def analyze_symptoms(user_input: str, lang: str = "en") -> Dict:
             context['symptoms'].append(symptom)
     
     locations = ["durban", "johannesburg", "cape town", "pretoria", "limpopo", 
-                "mpumalanga", "kwazulu-natal", "mozambique", "zimbabwe", "botswana"]
+                "mpumalanga", "kwazulu-natal", "mozambique", "zimbabwe", "botswana",
+                "malawi", "tanzania", "kenya", "uganda", "angola", "namibia",
+                "zambia", "congo", "ethiopia", "sudan", "south sudan"]
     for loc in locations:
         if loc in input_lower:
             context['locations'].append(loc)
     
     activity_patterns = {
-        'sexual': ['unprotected sex', 'had sex', 'sexual', 'intercourse'],
-        'travel': ['travel', 'trip', 'vacation', 'went to', 'visited'],
-        'food': ['ate', 'eating', 'food', 'meal'],
-        'mosquito': ['mosquito', 'bitten', 'bugs', 'insects']
+        'sexual': ['unprotected sex', 'had sex', 'sexual', 'intercourse', 'sexually active', ],
+        'travel': ['travel', 'trip', 'vacation', 'went to', 'visited', 'travelled', 'traveling', 'traveled', 'travelling'],
+        'food': ['ate', 'eating', 'food', 'meal', 'drank', 'water', 'restaurant', 'dining'],
+        'mosquito': ['mosquito', 'bitten', 'bugs', 'insects', 'bug bites', 'mosquitoes'],
+        'contact': ['contact with', 'exposed to', 'around someone with', 'someone who has', 'cared for someone with'],
+        'animal': ['animal', 'pet', 'dog', 'cat', 'cattle', 'livestock', 'wildlife'],
+        'hospital': ['hospital', 'clinic', 'healthcare', 'medical facility', 'doctor', 'nurse'],
+        'crowded': ['crowded', 'large gathering', 'party', 'event', 'crowd', 'public transport'],
+        'water': ['swam', 'swimming', 'water', 'lake', 'river', 'pool', 'beach'],
+        'hiking': ['hiking', 'camping', 'outdoors', 'trekking', 'nature', 'bush'],
+        'farming': ['farming', 'farm', 'agriculture', 'crops', 'field work'],
+        'construction': ['construction', 'building site', 'worksite', 'dusty', 'debris'],
+        'mining': ['mining', 'mine', 'underground', 'miner', 'shaft'],
+        'healthcare': ['healthcare worker', 'nurse', 'doctor', 'hospital staff', 'clinic worker'],
+        'prison': ['prison', 'jail', 'inmate', 'correctional facility', 'detention center'],
+        'school': ['school', 'classroom', 'student', 'teacher', 'university', 'college'],
+        'military': ['military', 'soldier', 'army', 'navy', 'air force', 'base'],
+        'refugee': ['refugee', 'displaced', 'camp', 'asylum seeker', 'migrant'],
+        'homeless': ['homeless', 'shelter', 'street', 'living rough', 'no fixed address'],
+        'elderly': ['elderly', 'senior', 'old age', 'retirement home', 'nursing home'],
+        'childcare': ['childcare', 'daycare', 'nursery', 'preschool', 'kindergarten'],
     }
     
     for activity_type, patterns in activity_patterns.items():
@@ -207,7 +266,7 @@ def analyze_symptoms(user_input: str, lang: str = "en") -> Dict:
     elif len(context['symptoms']) >= 3 or 'fever' in context['symptoms']:
         urgency = 'moderate'
     
-    return {
+    result = {
         'context': context,
         'possible_conditions': possible_conditions[:5],
         'urgency': urgency,
@@ -216,6 +275,96 @@ def analyze_symptoms(user_input: str, lang: str = "en") -> Dict:
             'sexual': 'sexual' in context['activities']
         }
     }
+    
+    result = enhance_ai_reasoning(result, input_method)
+    
+    return result
+
+def enhance_ai_reasoning(analysis: dict, input_method: str = "text") -> dict:
+    """Enhanced multi-modal reasoning for better diagnosis"""
+    
+    confidence_boost = {
+        'voice': 1.1,
+        'body_map': 1.2,
+        'text': 1.0
+    }
+    
+    if input_method == 'body_map':
+        for condition in analysis['possible_conditions']:
+            condition['confidence'] *= confidence_boost[input_method]
+            condition['precision'] = 'high'
+    
+    symptom_combinations = {
+        ('fever', 'headache', 'muscle pain'): ['malaria', 'dengue', 'flu', 'covid-19'],
+        ('chest pain', 'shortness of breath'): ['heart attack', 'pneumonia', 'pulmonary embolism'],
+        ('abdominal pain', 'vomiting', 'fever'): ['appendicitis', 'food poisoning', 'gastroenteritis'],
+        ('fever', 'rash', 'headache'): ['meningitis', 'measles', 'dengue'],
+        ('cough', 'fever', 'shortness of breath'): ['tuberculosis', 'pneumonia', 'covid-19'],
+        ('fever', 'joint pain', 'rash'): ['dengue', 'chikungunya', 'rheumatic fever'],
+        ('weight loss', 'night sweats', 'cough'): ['tuberculosis', 'hiv', 'cancer'],
+        ('fever', 'headache', 'stiff neck'): ['meningitis', 'encephalitis'],
+        ('abdominal pain', 'fever', 'jaundice'): ['hepatitis', 'gallstones', 'pancreatitis'],
+        ('chest pain', 'sweating', 'nausea'): ['heart attack', 'angina', 'acid reflux']
+    }
+    
+    current_symptoms = tuple(sorted(analysis['context']['symptoms']))
+    for combo, conditions in symptom_combinations.items():
+        if all(s in current_symptoms for s in combo):
+            for cond in analysis['possible_conditions']:
+                if any(c in cond['disease'].lower() for c in conditions):
+                    cond['confidence'] = min(cond['confidence'] * 1.3, 0.95)
+                    cond['pattern_match'] = True
+                    cond['symptom_pattern'] = ', '.join(combo)
+    
+    sa_specific_patterns = {
+        ('fever', 'chills', 'sweating'): ['malaria'],
+        ('cough', 'weight loss', 'night sweats'): ['tuberculosis'],
+        ('fever', 'rash', 'joint pain'): ['dengue', 'chikungunya'],
+        ('fever', 'headache', 'muscle pain', 'travel_history'): ['malaria', 'dengue']
+    }
+    
+    if 'locations' in analysis['context']:
+        for loc in analysis['context']['locations']:
+            if any(area in loc.lower() for area in ['limpopo', 'mpumalanga', 'kzn', 'kwazulu']):
+                for cond in analysis['possible_conditions']:
+                    if 'malaria' in cond['disease'].lower():
+                        cond['confidence'] = min(cond['confidence'] * 1.4, 0.95)
+                        cond['geographic_risk'] = 'high'
+    
+    analysis['reasoning'] = generate_diagnostic_reasoning(analysis)
+    
+    return analysis
+
+def generate_diagnostic_reasoning(analysis: dict) -> str:
+    """Generate explanation of diagnostic reasoning"""
+    
+    reasoning = []
+    
+    if analysis['possible_conditions']:
+        top = analysis['possible_conditions'][0]
+        
+        if top['confidence'] > 0.7:
+            reasoning.append(f"High confidence for {top['disease']} due to:")
+        else:
+            reasoning.append(f"Considering {top['disease']} because:")
+        
+        if top.get('matched_symptoms'):
+            reasoning.append(f"matching symptoms: {', '.join(top['matched_symptoms'])}")
+        
+        if top.get('pattern_match'):
+            reasoning.append("classic symptom pattern")
+        
+        if top.get('geographic_risk'):
+            reasoning.append("high geographic risk area")
+        
+        if analysis['urgency'] == 'high':
+            reasoning.append("⚠️ URGENT: immediate care recommended")
+        elif analysis['urgency'] == 'moderate':
+            reasoning.append("⚠️ Important: clinic visit within 24 hours")
+    
+    reasoning.append("Based on South African clinical guidelines")
+    
+    return ". ".join(reasoning)
 
 def generate_follow_up_questions(symptoms: list, risk_factors: dict, context: dict = None) -> list:
     """Generate intelligent follow-up questions based on medical analysis"""
@@ -345,6 +494,9 @@ def format_medical_response(analysis: dict, user_input: str) -> str:
     if symptoms:
         response_parts.append(f"I understand you're experiencing {', '.join(symptoms)}. Let me help analyze what this might indicate.\n")
     
+    if analysis.get('reasoning'):
+        response_parts.append(f"**Clinical Reasoning:** {analysis['reasoning']}\n")
+    
     conditions = analysis['possible_conditions']
     if conditions:
         response_parts.append("**Based on your symptoms, here are the most likely conditions:**\n")
@@ -389,7 +541,16 @@ def get_south_africa_guidance(disease_info: Dict[str, Any]) -> str:
         'aids': "Advanced care available at district hospitals. Support groups widely available.",
         'malnutrition': "Nutritional supplements at primary clinics. Severe cases to district hospitals.",
         'asthma': "Inhalers available at clinics. Emergency care at community health centers.",
-        'gonorrhea': "Treatment available at all clinics. Partner notification services provided."
+        'gonorrhea': "Treatment available at all clinics. Partner notification services provided.",
+        'syphilis': "Free testing and treatment at public clinics. Follow-up testing recommended.",
+        'chlamydia': "Antibiotics available at clinics. Partner treatment recommended.",
+        'tuberculosis': "Free TB testing and treatment at all clinics. DOTS program in place.",
+        'diabetes': "Monitoring and medications at clinics. Education programs available.",
+        'hypertension': "Blood pressure meds at clinics. Lifestyle counseling provided.",
+        'malaria': "Testing and treatment free at clinics. Prevention education widely available.",
+        'covid-19': "Testing and vaccines free at clinics. Isolation and treatment protocols in place.",
+        'influenza': "Flu vaccines available seasonally at clinics. Symptomatic treatment provided.",
+        'ebola': "Specialized care at designated hospitals. Strict infection control protocols.",
     }
     
     return guidance_map.get(name, 
@@ -531,8 +692,9 @@ def chat():
         
         if session_id not in conversation_memory:
             conversation_memory[session_id] = deque(maxlen=MAX_HISTORY)
-        
-        analysis = analyze_symptoms(user_input)
+            
+        input_method = data.get("input_method", "text")
+        analysis = analyze_symptoms(user_input, input_method=input_method)
         
         direct_match = find_matching_disease(user_input)
         
@@ -618,11 +780,12 @@ def record_audio():
                 'speaker': 'patient'
             })
             
-            analysis = analyze_symptoms(transcription)
+            analysis = analyze_symptoms(transcription, input_method="voice")
             
             return jsonify({
                 "transcription": transcription,
                 "analysis": analysis,
+                "reasoning": analysis.get('reasoning', ''),
                 "success": True
             })
         else:
@@ -667,6 +830,106 @@ def get_conversation_summary():
     except Exception as e:
         logger.error(f"Summary generation error: {str(e)}")
         return jsonify({"error": str(e)}), 500
+    
+@app.route("/analyze_body_region", methods=["POST"])
+def analyze_body_region():
+    """Analyze symptoms based on body region selection"""
+    try:
+        data = request.get_json()
+        body_region = data.get('region')
+        symptoms = data.get('symptoms', [])
+        session_id = data.get('session_id', 'default')
+        
+        region_conditions = {
+            'head': {
+                'conditions': ['migraine', 'tension headache', 'sinusitis', 'meningitis', 'concussion', 'stroke', 'brain tumor',
+                               'ear infection', 'glaucoma', 'temporal arteritis', 'cluster headache', 'giant cell arteritis', 'cervical spondylosis',
+                               'trigeminal neuralgia', 'dental abscess', 'otitis media', 'mastoiditis', 'acute glaucoma', 'subarachnoid hemorrhage'],
+                'symptoms': ['headache', 'dizziness', 'vision problems', 'ear pain', 'nausea', 'vomiting', 'neck stiffness'],
+                'urgent_signs': ['severe headache with fever', 'neck stiffness', 'confusion','loss of consciousness', 'seizures' ,
+                                 'weakness on one side', 'slurred speech' , 'sudden vision loss' , 'severe head trauma' ,'nausea and vomiting' ,
+                                 'loss of balance' , 'persistent vomiting' , 'pupil changes' , 'severe headache after head injury']
+            },
+            'chest': {
+                'conditions': ['heart attack', 'pneumonia', 'bronchitis', 'asthma', 'angina', 'pulmonary embolism', 'pneumothorax', 'pericarditis',
+                               'aortic dissection', 'esophageal rupture', 'costochondritis', 'gastroesophageal reflux disease (GERD)', 'lung cancer',
+                               'tuberculosis', 'pleurisy', 'heart failure', 'myocarditis', 'endocarditis', 'valvular heart disease', 'arrhythmia'],
+                'symptoms': ['chest pain', 'shortness of breath', 'cough', 'palpitations', 'fatigue', 'wheezing', 'rapid heartbeat', ],
+                'urgent_signs': ['crushing chest pain', 'difficulty breathing', 'coughing blood', 'sudden severe pain', 'loss of consciousness', 'severe shortness of breath']
+            },
+            'abdomen': {
+                'conditions': ['appendicitis', 'gastroenteritis', 'ulcer', 'gallstones', 'pancreatitis', 'diverticulitis', 'hernia', 'kidney stones',
+                               'liver disease', 'intestinal obstruction', 'ectopic pregnancy', 'ovarian cysts', 'pelvic inflammatory disease (PID)', 'inflammatory bowel disease (IBD)',
+                               'irritable bowel syndrome (IBS)', 'cholecystitis', 'hepatitis', 'peritonitis', 'abdominal aortic aneurysm', 'celiac disease'],
+                'symptoms': ['abdominal pain', 'nausea', 'vomiting', 'diarrhea', 'bloating', 'constipation', 'loss of appetite', 'fever'],
+                'urgent_signs': ['severe pain', 'rigid abdomen', 'bloody stool', 'persistent vomiting', 'high fever', 'jaundice', 'difficulty breathing', 'severe dehydration', 'sudden weight loss',
+                                 'swelling of abdomen', 'severe abdominal distension', 'severe tenderness to touch', 'inability to pass stool or gas', 'severe abdominal cramping', 'blood in vomit', 'severe abdominal pain radiating to back', 'fainting or dizziness' ]
+            },
+            'back': {
+                'conditions': ['muscle strain', 'herniated disc', 'kidney stones', 'spinal issues', 'sciatica', 'osteoporosis', 'arthritis', 'spinal stenosis',
+                               'spondylolisthesis', 'vertebral fracture', 'infections (e.g., osteomyelitis)', 'tumors (benign or malignant)', 'cauda equina syndrome',
+                               'ankylosing spondylitis', 'fibromyalgia', 'degenerative disc disease', 'spinal cord injury', 'discitis', 'sacroiliitis', 'spinal abscess'],
+                'symptoms': ['back pain', 'stiffness', 'numbness', 'tingling', 'weakness', 'limited mobility', 'muscle spasms', 'pain radiating down legs'],
+                'urgent_signs': ['loss of bladder control', 'severe pain with fever', 'paralysis', 'saddle anesthesia', 'severe trauma', 'unexplained weight loss',
+                                 'night pain', 'progressive weakness', 'loss of sensation in groin area', 'severe back pain after fall or accident', 'bowel incontinence',
+                                 'severe back pain with fever and chills']
+            },
+            'arms': {
+                'conditions': ['fracture', 'tendinitis', 'carpal tunnel', 'arthritis', 'bursitis', 'nerve compression', 'muscle strain', 'rotator cuff injury',
+                               'dislocation', 'cubital tunnel syndrome', 'thoracic outlet syndrome', 'ganglion cyst', 'complex regional pain syndrome (CRPS)', 'peripheral neuropathy',
+                               'osteomyelitis', 'lymphangitis', 'deep vein thrombosis (DVT)', 'compartment syndrome', 'vascular injury'],
+                'symptoms': ['arm pain', 'weakness', 'numbness', 'swelling', 'tingling', 'limited movement', 'muscle cramps', 'joint stiffness'],
+                'urgent_signs': ['deformity', 'severe pain', 'loss of pulse', 'numbness', 'open wound', 'sudden swelling', 'severe bleeding', 'loss of sensation', 'inability to move the arm',
+                                 'severe deformity or angulation', 'severe swelling with skin changes', 'loss of pulse or cold extremity', 'severe bleeding', 'open fracture with bone protruding', 'severe pain unrelieved by rest or medication']
+            },
+            'legs': {
+                'conditions': ['DVT', 'fracture', 'muscle cramp', 'varicose veins', 'peripheral artery disease', 'cellulitis', 'arthritis', 'bursitis',
+                               'tendonitis', 'compartment syndrome', 'osteomyelitis', 'peripheral neuropathy', 'deep vein thrombosis (DVT)', 'chronic venous insufficiency',
+                               'lymphedema', 'gout', 'restless leg syndrome', 'spinal stenosis', 'sciatica', 'vascular injury'],
+                'symptoms': ['leg pain', 'swelling', 'cramping', 'weakness', 'numbness', 'tingling', 'limited mobility', 'skin changes', 'redness'],
+                'urgent_signs': ['sudden swelling', 'chest pain with leg pain', 'loss of feeling', 'severe pain', 'open wound', 'severe bleeding', 'inability to move the leg',
+                                 'sudden onset of leg swelling and pain', 'pain worsened by walking', 'chest pain or shortness of breath with leg pain', 'loss of sensation or movement in the leg',
+                                 'severe deformity or angulation', 'open fracture with bone protruding', 'severe bleeding', 'severe pain unrelieved by rest or medication']
+            }
+        }
+        
+        region_data = region_conditions.get(body_region, {})
+        
+        analysis_prompt = f"""
+        Patient has indicated {body_region} region symptoms.
+        Reported symptoms: {', '.join(symptoms)}
+        Common conditions for this region: {', '.join(region_data.get('conditions', []))}
+        
+        Provide detailed medical analysis considering South African health context.
+        """
+        
+        enhanced_analysis = analyze_symptoms(' '.join(symptoms))
+        
+        urgent = any(sign in ' '.join(symptoms).lower() 
+                    for sign in region_data.get('urgent_signs', []))
+        
+        enhanced_analysis = analyze_symptoms(' '.join(symptoms), input_method="body_map")
+        
+        response = {
+            'region': body_region,
+            'possible_conditions': region_data.get('conditions', []),
+            'common_symptoms': region_data.get('symptoms', []),
+            'analysis': enhanced_analysis,
+            'reasoning': enhanced_analysis.get('reasoning', ''),
+            'urgent': urgent,
+            'recommendation': 'Seek immediate care' if urgent else 'Schedule clinic visit',
+            'success': True
+        }
+        
+        return jsonify(response)
+        
+    except Exception as e:
+        logger.error(f"Body region analysis error: {str(e)}")
+        return jsonify({'error': str(e), 'success': False}), 500
+    
+@app.route("/body_map")
+def body_map():
+    return render_template("body_map.html")
 
 def format_medical_report(summary: dict, session_id: str) -> str:
     """Format summary as a professional medical report"""
