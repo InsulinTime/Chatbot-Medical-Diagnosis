@@ -1,3 +1,4 @@
+//this file is static/script.js
 document.addEventListener('DOMContentLoaded', function() {
     const chatButton = document.getElementById('chatButton');
     const chatBox = document.getElementById('chatBox');
@@ -19,6 +20,14 @@ document.addEventListener('DOMContentLoaded', function() {
     let recognition;
     let currentSymptomStep = 0;
     let symptomResponses = {};
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+
+    if (!sessionStorage.getItem('session_id')) {
+        sessionStorage.setItem('session_id', 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
+    }
+
     const symptomQuestions = {
         en: [
             {
@@ -263,7 +272,6 @@ document.addEventListener('DOMContentLoaded', function() {
         ]
     };
 
-    // Add these event listeners
     document.getElementById('symptomCheck').addEventListener('click', function() {
         optionsModal.classList.remove('active');
         startSymptomChecker();
@@ -272,7 +280,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('prevSymptom').addEventListener('click', prevSymptomStep);
     document.getElementById('nextSymptom').addEventListener('click', nextSymptomStep);
 
-    // Add these functions
     function startSymptomChecker() {
         currentSymptomStep = 0;
         symptomResponses = {};
@@ -286,7 +293,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const questions = symptomQuestions[currentLanguage] || symptomQuestions.en;
         
-        // Add progress bar
         const progressPercent = (currentSymptomStep / (questions.length - 1)) * 100;
         stepsContainer.innerHTML = `
             <div class="symptom-progress">
@@ -307,7 +313,6 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             stepsContainer.appendChild(stepDiv);
             
-            // Select previously chosen option if exists
             if (symptomResponses[index]) {
                 const options = stepDiv.querySelectorAll('.symptom-option');
                 options.forEach(opt => {
@@ -318,7 +323,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Set up option selection
         document.querySelectorAll('.symptom-option').forEach(option => {
             option.addEventListener('click', function() {
                 this.parentNode.querySelectorAll('.symptom-option').forEach(opt => {
@@ -329,7 +333,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        // Update nav buttons
         document.getElementById('prevSymptom').disabled = currentSymptomStep === 0;
         document.getElementById('nextSymptom').textContent = 
             currentSymptomStep === questions.length - 1 ? 
@@ -363,10 +366,31 @@ document.addEventListener('DOMContentLoaded', function() {
             currentSymptomStep++;
             renderSymptomStep();
         } else {
-            // Submit symptoms for analysis
             submitSymptoms();
         }
     }
+
+    if (isSpeechRecognitionSupported) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+        
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            userInput.value = transcript;
+            userInput.focus();
+        };
+        
+        recognition.onerror = function(event) {
+            console.error('Speech recognition error', event.error);
+            if (event.error !== 'no-speech') {
+                addMessage('Sorry, I couldn\'t understand your voice. Please try typing.', 'receive');
+            }
+        };
+    }
+    initVoiceRecording();
 
     async function submitSymptoms() {
         document.getElementById('symptomCheckerModal').classList.remove('active');
@@ -376,7 +400,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 'Ontleed jou simptome...', 'receive');
         
         try {
-            // Prepare symptom data
             const symptomData = {
                 main_symptom: symptomResponses[0],
                 duration: symptomResponses[1],
@@ -408,74 +431,99 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    if (isSpeechRecognitionSupported) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'en-US';
-        
-        recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
-            userInput.value = transcript;
-            userInput.focus();
-        };
-        
-        recognition.onerror = function(event) {
-            console.error('Speech recognition error', event.error);
-            addMessage('Sorry, I couldn\'t understand your voice. Please try typing.', 'receive');
-        };
-    } else {
-        voiceBtn.style.display = 'none';
+    if (voiceBtn) {
+        voiceBtn.addEventListener('click', function() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                toggleRecording();
+            } else if (isSpeechRecognitionSupported && !mediaRecorder) {
+                try {
+                    recognition.start();
+                    addTypingIndicator('Listening...');
+                    voiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+                    
+                    recognition.onspeechend = function() {
+                        recognition.stop();
+                        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                        removeTypingIndicator();
+                    };
+                } catch (e) {
+                    console.error('Speech recognition error:', e);
+                    voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                    removeTypingIndicator();
+                }
+            }
+        });
     }
     
-    // Toggle chat box with animation
     chatButton.addEventListener('click', function() {
         chatBox.classList.toggle('active');
         if (chatBox.classList.contains('active')) {
-            // Remove notification badge when chat is opened
             document.querySelector('.notification-badge').style.display = 'none';
         }
     });
     
-    // Close chat
     closeChat.addEventListener('click', function() {
         chatBox.classList.remove('active');
     });
     
-    // Open options modal
     addExtra.addEventListener('click', function() {
         optionsModal.classList.add('active');
     });
     
-    // Close options modal
     modalClose.addEventListener('click', function() {
         optionsModal.classList.remove('active');
     });
     
-    // Open emergency modal
+    async function getResponse(message) {
+        addTypingIndicator(currentLanguage === 'en' ? 'EDI is thinking...' : 
+                        currentLanguage === 'zu' ? 'EDI iyacabanga...' :
+                        currentLanguage === 'xh' ? 'EDI iyacinga...' :
+                        currentLanguage === 'af' ? 'EDI dink...':
+                        'EDI is processing...');
+        
+        try {
+            const response = await fetch('/get', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    msg: message,
+                    lang: currentLanguage,
+                    session_id: sessionStorage.getItem('session_id') || 'default'
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || "Request failed");
+            }
+            
+            const formattedResponse = formatAIResponse(data.answer);
+            addMessage(formattedResponse, 'receive');
+            
+            if (data.session_id) {
+                sessionStorage.setItem('session_id', data.session_id);
+            }
+            
+        } catch (error) {
+            addMessage(`Sorry, I encountered an error. Please try again.`, 'receive');
+            console.error('Chat error:', error);
+        } finally {
+            removeTypingIndicator();
+        }
+    }
+
     emergencyBtn.addEventListener('click', function() {
         optionsModal.classList.remove('active');
         emergencyModal.classList.add('active');
     });
     
-    // Close emergency modal
     closeEmergency.addEventListener('click', function() {
         emergencyModal.classList.remove('active');
     });
     
-    // Print functionality
     printBtn.addEventListener('click', function() {
-        // Create a printable summary of the conversation
-        const printContent = generatePrintableSummary();
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(printContent);
-        printWindow.document.close();
-        printWindow.focus();
-        setTimeout(() => {
-            printWindow.print();
-            printWindow.close();
-        }, 500);
+        getSummary();
     });
     
     document.querySelectorAll('.quick-btn').forEach(button => {
@@ -486,27 +534,156 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    if (isSpeechRecognitionSupported) {
-        voiceBtn.addEventListener('click', function() {
-            try {
-                recognition.start();
-                addTypingIndicator('Listening...');
-                voiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+    
+
+    async function initVoiceRecording() {
+        try {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                console.warn('Voice recording not supported in this browser');
+                return;
+            }
+            
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg';
+            
+            mediaRecorder = new MediaRecorder(stream, { mimeType });
+            
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunks.push(event.data);
+                }
+            };
+            
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: mimeType });
+                audioChunks = [];
                 
-                recognition.onspeechend = function() {
-                    recognition.stop();
-                    voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-                    removeTypingIndicator();
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    const base64Audio = reader.result;
+                    addTypingIndicator('Processing audio...');
+                    
+                    try {
+                        const response = await fetch('/record_audio', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                audio: base64Audio,
+                                session_id: sessionStorage.getItem('session_id') || 'default',
+                                lang: currentLanguage
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        removeTypingIndicator();
+                        
+                        if (data.success && data.transcription) {
+                            addMessage(data.transcription, 'send');
+                            getResponse(data.transcription);
+                        } else {
+                            addMessage('Could not transcribe audio. Please try typing instead.', 'receive');
+                        }
+                    } catch (error) {
+                        console.error('Audio processing error:', error);
+                        removeTypingIndicator();
+                        addMessage('Error processing audio. Please try again.', 'receive');
+                    }
                 };
-            } catch (e) {
-                console.error('Speech recognition error:', e);
+                reader.readAsDataURL(audioBlob);
+            };
+            
+            mediaRecorder.onerror = (event) => {
+                console.error('MediaRecorder error:', event.error);
+                isRecording = false;
+                voiceBtn.classList.remove('recording');
                 voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-                removeTypingIndicator();
+            };
+            
+        } catch (error) {
+            console.error('Error initializing voice recording:', error);
+            if (voiceBtn) voiceBtn.style.display = 'none';
+        }
+    }
+
+    function toggleRecording() {
+        const voiceBtn = document.getElementById('voiceBtn');
+        
+        if (!isRecording) {
+            mediaRecorder.start();
+            isRecording = true;
+            voiceBtn.classList.add('recording');
+            voiceBtn.innerHTML = '<i class="fas fa-stop"></i>';
+        } else {
+            mediaRecorder.stop();
+            isRecording = false;
+            voiceBtn.classList.remove('recording');
+            voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+        }
+    }
+
+    function getSummary() {
+        fetch('/get_conversation_summary', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                session_id: sessionStorage.getItem('session_id') || 'default'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displaySummaryModal(data.report);
             }
         });
     }
+
+    function displaySummaryModal(report) {
+        const modal = document.createElement('div');
+        modal.className = 'modal show';
+        modal.id = 'summaryModal';
+        
+        const encodedReport = btoa(encodeURIComponent(report));
+        
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="modal-close-button" onclick="document.getElementById('summaryModal').remove()">&times;</span>
+                <h3><i class="fas fa-file-medical"></i> Consultation Summary</h3>
+                <pre style="white-space: pre-wrap; font-family: monospace; background: #f5f5f5; padding: 15px; border-radius: 5px; max-height: 400px; overflow-y: auto;">
+    ${report}
+                </pre>
+                <button onclick="printReport('${encodedReport}')" class="modal-btn">
+                    <i class="fas fa-print"></i> Print Summary
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    window.printReport = function(encodedReport) {
+        try {
+            const report = atob(encodedReport);
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write('<html><head><title>Medical Summary</title>');
+            printWindow.document.write('<style>body { font-family: Arial; padding: 20px; } pre { white-space: pre-wrap; }</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<pre>' + report + '</pre>');
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            setTimeout(() => {
+                printWindow.print();
+            }, 250);
+        } catch (error) {
+            console.error('Print error:', error);
+            alert('Unable to print. Please try again.');
+        }
+    }
+
+    initVoiceRecording();
+    document.getElementById('voiceBtn').addEventListener('click', toggleRecording);
+    document.getElementById('printBtn').addEventListener('click', getSummary);
     
-    // Send message function with enhanced features
     async function sendMessage() {
         const message = userInput.value.trim();
         if (!message) return;
@@ -514,7 +691,6 @@ document.addEventListener('DOMContentLoaded', function() {
         addMessage(message, 'send');
         userInput.value = '';
         
-        // Show typing indicator
         addTypingIndicator(currentLanguage === 'en' ? 'EDI is thinking...' : 
                         currentLanguage === 'zu' ? 'EDI iyacabanga...' :
                         currentLanguage === 'xh' ? 'EDI iyacinga...' :

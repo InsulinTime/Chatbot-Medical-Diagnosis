@@ -1,3 +1,4 @@
+#this file is store_index.py
 from src.helper import load_pdf_file, text_split, download_huggingface_embeddings
 from pinecone import Pinecone, ServerlessSpec
 from langchain_pinecone import PineconeVectorStore

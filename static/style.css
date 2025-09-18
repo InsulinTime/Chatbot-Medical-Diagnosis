@@ -1,3 +1,4 @@
+/*this file is static/style.css*/
 /* Base Styles with South African color theme */
 :root {
     --primary: #2C50EF;
@@ -141,7 +142,26 @@ body {
     opacity: 1;
 }
 
-/* Chat Body - Improved message display */
+.recording {
+    background-color: #ff4444 !important;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+.modal.show {
+    display: block;
+}
+
+.modal pre {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
 .chat-box-body {
     flex: 1;
     padding: 15px;
@@ -153,7 +173,6 @@ body {
     background-attachment: local;
 }
 
-/* Message Styles - More modern bubbles */
 .chat-box-body-send,
 .chat-box-body-receive {
     max-width: 85%;

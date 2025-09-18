@@ -1,3 +1,4 @@
+#this is the requirements.txt file, these are the dependencies chosen for the project that also work with each other and the python version (don't change versions without checking compatibility)
 -e .
 flask==3.0.3
 python-dotenv==1.0.1
@@ -15,4 +16,6 @@ accelerate==0.30.1
 tqdm==4.66.2
 pypdf==4.2.0
 faiss-cpu==1.7.4
+SpeechRecognition==3.10.0
+pyaudio
 googletrans==4.0.0-rc1
