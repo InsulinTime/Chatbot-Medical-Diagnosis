@@ -1,5 +1,5 @@
 #this file is app.py
-from flask import Flask, render_template, jsonify, request, session
+from flask import Flask, render_template, jsonify, request, session, url_for, redirect
 from src.helper import download_huggingface_embeddings, load_medical_disease_data
 from langchain_pinecone import PineconeVectorStore
 from dotenv import load_dotenv
@@ -8,6 +8,7 @@ import time
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
+from langchain.llms.base import LLM
 from src.prompt import system_prompt, enhance_response
 import os
 from store_index import text_chunks
@@ -26,6 +27,10 @@ import io
 import base64
 from datetime import datetime
 import speech_recognition as sr
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_sqlalchemy import SQLAlchemy
+from models import db, User, Consultation, MedicalRecord, Article
+import secrets
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -618,16 +623,18 @@ try:
         token=os.getenv("HUGGINGFACE_API_TOKEN")
     )
     
-    class HFWrapper:
+    class HFWrapper(LLM):
+        client: Any
+        
         def __init__(self, client):
+            super().__init__()
             self.client = client
         
-        def invoke(self, input_dict):
-            if isinstance(input_dict, dict):
-                prompt = input_dict.get('input', '')
-            else:
-                prompt = str(input_dict)
-            
+        @property
+        def _llm_type(self) -> str:
+            return "huggingface"
+        
+        def _call(self, prompt: str, stop: Optional[List[str]] = None) -> str:
             try:
                 response = self.client.text_generation(
                     prompt,
@@ -635,11 +642,19 @@ try:
                     temperature=0.7
                 )
                 return response
-            except:
-                return SimpleMedicalLLM().invoke(input_dict)
+            except Exception as e:
+                print(f"Hugging Face API error: {e}")
+                return SimpleMedicalLLM().invoke({'input': prompt})
+        
+        def invoke(self, input_dict):
+            if isinstance(input_dict, dict):
+                prompt = input_dict.get('input', '')
+            else:
+                prompt = str(input_dict)
+            return self._call(prompt)
     
     llm = HFWrapper(client)
-    print("✓ Using Hugging Face API for responses")
+    print("✓ Using Hugging Face API for responses with LangChain compatibility")
     
 except Exception as e:
     print(f"Note: Using simple response system. API error: {e}")
@@ -665,6 +680,14 @@ except Exception as e:
     rag_chain = None
 
 app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['SECRET_KEY'] = secrets.token_hex(16)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///medical_app.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.init_app(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
 
 @app.before_request
 def track_conversation():
@@ -672,12 +695,12 @@ def track_conversation():
     if session_id not in conversation_memory:
         conversation_memory[session_id] = deque(maxlen=MAX_HISTORY)
 
-@app.route("/")
-def index():
+@app.route("/chat")
+def chat_page():
     return render_template("chat.html")
 
 @app.route("/get", methods=["POST"])
-def chat():
+def get_chat_response():
     try:
         data = request.get_json()
         if not data or 'msg' not in data:
@@ -755,6 +778,131 @@ def chat():
     except Exception as e:
         logger.error(f"Chat error: {str(e)}", exc_info=True)
         return jsonify({"answer": "I apologize, but I'm having trouble processing your request. Please try rephrasing your question or describe your symptoms in more detail."}), 200
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+@app.route('/')
+def home():
+    articles = Article.query.order_by(Article.created_at.desc()).limit(6).all()
+    return render_template('home.html', articles=articles)
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        data = request.get_json()
+        
+        if User.query.filter_by(email=data['email']).first():
+            return jsonify({'error': 'Email already registered'}), 400
+        
+        user = User(
+            email=data['email'],
+            username=data['username'],
+            user_type=data['user_type']
+        )
+        user.set_password(data['password'])
+        
+        if data['user_type'] == 'patient':
+            user.medical_aid_number = data.get('medical_aid_number')
+            user.id_number = data.get('id_number')
+        else:
+            user.practice_number = data.get('practice_number')
+            user.specialization = data.get('specialization')
+            user.clinic_name = data.get('clinic_name')
+        
+        db.session.add(user)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'Registration successful'}), 201
+    
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        data = request.get_json()
+        user = User.query.filter_by(email=data['email']).first()
+        
+        if user and user.check_password(data['password']):
+            login_user(user)
+            return jsonify({'success': True, 'user_type': user.user_type}), 200
+        
+        return jsonify({'error': 'Invalid credentials'}), 401
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
+
+@app.route('/patient-dashboard')
+@login_required
+def patient_dashboard():
+    if current_user.user_type != 'patient':
+        return redirect(url_for('practitioner_dashboard'))
+    
+    consultations = Consultation.query.filter_by(user_id=current_user.id).order_by(Consultation.created_at.desc()).all()
+    records = MedicalRecord.query.filter_by(patient_id=current_user.id).order_by(MedicalRecord.created_at.desc()).all()
+    
+    return render_template('patient_dashboard.html', consultations=consultations, records=records)
+
+@app.route('/practitioner-dashboard')
+@login_required
+def practitioner_dashboard():
+    if current_user.user_type != 'practitioner':
+        return redirect(url_for('patient_dashboard'))
+    
+    recent_consultations = Consultation.query.order_by(Consultation.created_at.desc()).limit(10).all()
+    
+    return render_template('practitioner_dashboard.html', consultations=recent_consultations)
+
+@app.route('/articles')
+def articles():
+    category = request.args.get('category', 'all')
+    if category == 'all':
+        articles = Article.query.order_by(Article.created_at.desc()).all()
+    else:
+        articles = Article.query.filter_by(category=category).order_by(Article.created_at.desc()).all()
+    
+    return render_template('articles.html', articles=articles)
+
+@app.route('/article/<int:article_id>')
+def article(article_id):
+    article = Article.query.get_or_404(article_id)
+    article.views += 1
+    db.session.commit()
+    
+    related = Article.query.filter(
+        Article.category == article.category,
+        Article.id != article.id
+    ).limit(3).all()
+    
+    return render_template('article.html', article=article, related=related)
+
+@app.route('/save-consultation', methods=['POST'])
+@login_required
+def save_consultation():
+    data = request.get_json()
+    
+    consultation = Consultation(
+        user_id=current_user.id,
+        session_id=data.get('session_id'),
+        symptoms=data.get('symptoms'),
+        diagnosis_suggestion=data.get('diagnosis'),
+        urgency_level=data.get('urgency'),
+        transcript=data.get('transcript')
+    )
+    
+    db.session.add(consultation)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'consultation_id': consultation.id})
+
+with app.app_context():
+    db.create_all()
 
 @app.route("/record_audio", methods=["POST"])
 def record_audio():
@@ -930,6 +1078,10 @@ def analyze_body_region():
 @app.route("/body_map")
 def body_map():
     return render_template("body_map.html")
+
+@app.route("/conversation_recorder")
+def conversation_recorder():
+    return render_template("conversation_recorder.html")
 
 def format_medical_report(summary: dict, session_id: str) -> str:
     """Format summary as a professional medical report"""

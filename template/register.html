@@ -1,0 +1,273 @@
+<!--this file is template/register.html-->
+<!-- templates/register.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - EDI Medical</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1a73e8;
+            --secondary-blue: #4285f4;
+            --light-blue: #e8f0fe;
+            --beige: #f5f5f0;
+            --dark-beige: #e6e6d9;
+            --accent-green: #34a853;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --white: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-radius: 10px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--beige);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .auth-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            width: 100%;
+        }
+        
+        .auth-card h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-blue);
+            font-size: 1.8rem;
+        }
+        
+        .user-type-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .type-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--dark-beige);
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .type-btn.active {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            border-color: var(--primary-blue);
+        }
+        
+        .type-btn i {
+            font-size: 1.2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px var(--light-blue);
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn-submit:hover {
+            background-color: var(--secondary-blue);
+        }
+        
+        .auth-link {
+            text-align: center;
+            margin-top: 25px;
+            color: var(--text-light);
+        }
+        
+        .auth-link a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 576px) {
+            .auth-card {
+                padding: 30px 20px;
+            }
+            
+            .user-type-selector {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>Create Your Account</h2>
+            
+            <div class="user-type-selector">
+                <button class="type-btn active" data-type="patient">
+                    <i class="fas fa-user"></i> Patient
+                </button>
+                <button class="type-btn" data-type="practitioner">
+                    <i class="fas fa-user-md"></i> Medical Practitioner
+                </button>
+            </div>
+            
+            <form id="registerForm">
+                <div class="form-group">
+                    <input type="email" id="email" placeholder="Email Address" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="username" placeholder="Username" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" placeholder="Password" required>
+                </div>
+                
+                <div id="patientFields">
+                    <div class="form-group">
+                        <input type="text" id="id_number" placeholder="ID Number (optional)">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="medical_aid_number" placeholder="Medical Aid Number (optional)">
+                    </div>
+                </div>
+                
+                <div id="practitionerFields" style="display:none;">
+                    <div class="form-group">
+                        <input type="text" id="practice_number" placeholder="Practice Number" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="specialization" placeholder="Specialization">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="clinic_name" placeholder="Clinic/Hospital Name">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-submit">Register</button>
+            </form>
+            
+            <p class="auth-link">Already have an account? <a href="/login">Login</a></p>
+        </div>
+    </div>
+    
+    <script>
+        const typeBtns = document.querySelectorAll('.type-btn');
+        const patientFields = document.getElementById('patientFields');
+        const practitionerFields = document.getElementById('practitionerFields');
+        let userType = 'patient';
+        
+        typeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                typeBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                userType = btn.dataset.type;
+                
+                if (userType === 'patient') {
+                    patientFields.style.display = 'block';
+                    practitionerFields.style.display = 'none';
+                } else {
+                    patientFields.style.display = 'none';
+                    practitionerFields.style.display = 'block';
+                }
+            });
+        });
+        
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                email: document.getElementById('email').value,
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value,
+                user_type: userType
+            };
+            
+            if (userType === 'patient') {
+                formData.id_number = document.getElementById('id_number').value;
+                formData.medical_aid_number = document.getElementById('medical_aid_number').value;
+            } else {
+                formData.practice_number = document.getElementById('practice_number').value;
+                formData.specialization = document.getElementById('specialization').value;
+                formData.clinic_name = document.getElementById('clinic_name').value;
+            }
+            
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Registration successful! Please login.');
+                    window.location.href = '/login';
+                } else {
+                    alert(data.error || 'Registration failed');
+                }
+            } catch (error) {
+                alert('Error during registration');
+            }
+        });
+    </script>
+</body>
+</html>

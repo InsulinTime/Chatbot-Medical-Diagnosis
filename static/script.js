@@ -863,6 +863,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return html;
     }
 
+    document.getElementById('conversationRecorder').addEventListener('click', function() {
+        window.location.href = "/conversation_recorder";
+    });
+
     document.getElementById('bodyMap').addEventListener('click', function() {
         optionsModal.classList.remove('active');
         

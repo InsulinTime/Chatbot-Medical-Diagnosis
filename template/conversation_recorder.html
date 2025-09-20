@@ -1,0 +1,631 @@
+<!--This file template/conversation_recorder.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Conversation Recorder - EDI Medical Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --success: #22c55e;
+            --border-radius: 12px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 968px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .recorder-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            background: var(--gray-light);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gray);
+        }
+
+        .status-dot.recording {
+            background: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .transcript-container {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            background: white;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--gray-light);
+        }
+
+        .transcript-text {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .speaker {
+            font-weight: 600;
+            color: var(--primary);
+            margin-right: 5px;
+        }
+
+        .summary-section {
+            margin-top: 25px;
+        }
+
+        .summary-box {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--gray-light);
+            margin-top: 15px;
+        }
+
+        .key-points {
+            margin-top: 20px;
+        }
+
+        .point-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: var(--light);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary);
+        }
+
+        .point-item.important {
+            border-left-color: var(--accent);
+            background: #fffbeb;
+        }
+
+        .point-item.critical {
+            border-left-color: var(--danger);
+            background: #fef2f2;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .visualization {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .waveform {
+            width: 100%;
+            height: 80px;
+            background: #f1f5f9;
+            border-radius: var(--border-radius);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: var(--primary);
+            opacity: 0.3;
+        }
+
+        .wave-bar {
+            position: absolute;
+            bottom: 0;
+            width: 3px;
+            background: var(--primary);
+            border-radius: 2px 2px 0 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: var(--light);
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .timer {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .language-selector {
+            margin: 15px 0;
+        }
+
+        .language-selector select {
+            padding: 10px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            width: 100%;
+        }
+        
+        .placeholder {
+            color: var(--gray);
+            font-style: italic;
+        }
+        
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: white;
+            border-radius: var(--border-radius);
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+        
+        .nav-back:hover {
+            background: var(--gray-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="nav-back">
+            <i class="fas fa-arrow-left"></i> Back to Main Chat
+        </a>
+        
+        <header>
+            <h1><i class="fas fa-stethoscope"></i> Medical Conversation Recorder</h1>
+            <p>Record, transcribe, and summarize doctor-patient conversations with AI analysis</p>
+        </header>
+
+        <div class="content">
+            <div class="card">
+                <h2><i class="fas fa-microphone"></i> Conversation Recorder</h2>
+                
+                <div class="language-selector">
+                    <label for="languageSelect">Select Conversation Language:</label>
+                    <select id="languageSelect">
+                        <option value="en">English</option>
+                        <option value="zu">Zulu</option>
+                        <option value="xh">Xhosa</option>
+                        <option value="af">Afrikaans</option>
+                        <option value="st">Sesotho</option>
+                        <option value="tn">Setswana</option>
+                    </select>
+                </div>
+                
+                <div class="recorder-controls">
+                    <button id="startRecording" class="btn btn-primary">
+                        <i class="fas fa-record-vinyl"></i> Start Recording
+                    </button>
+                    <button id="stopRecording" class="btn btn-danger" disabled>
+                        <i class="fas fa-stop"></i> Stop Recording
+                    </button>
+                </div>
+                
+                <div class="status-indicator">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusText">Ready to record conversation</span>
+                </div>
+                
+                <div class="timer" id="timer">00:00:00</div>
+                
+                <div class="visualization">
+                    <div class="waveform" id="waveform">
+                        <!-- Wave bars will be generated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="transcribeBtn" class="btn btn-primary" disabled>
+                        <i class="fas fa-language"></i> Transcribe Conversation
+                    </button>
+                    <button id="analyzeBtn" class="btn btn-success" disabled>
+                        <i class="fas fa-brain"></i> Analyze & Summarize
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-file-medical-alt"></i> Conversation Analysis</h2>
+                
+                <div class="section-title">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>Live Transcript</h3>
+                </div>
+                <div class="transcript-container">
+                    <div class="transcript-text" id="transcript">
+                        <p class="placeholder">Transcript will appear here once recording starts...</p>
+                    </div>
+                </div>
+                
+                <div class="summary-section">
+                    <div class="section-title">
+                        <i class="fas fa-chart-pie"></i>
+                        <h3>AI Summary</h3>
+                    </div>
+                    <div class="summary-box" id="summary">
+                        <p class="placeholder">Conversation summary will be generated after analysis...</p>
+                    </div>
+                </div>
+                
+                <div class="key-points">
+                    <div class="section-title">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Key Medical Points</h3>
+                    </div>
+                    <div id="keyPoints">
+                        <p class="placeholder">Important medical points will be highlighted here...</p>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="saveReport" class="btn btn-primary" disabled>
+                        <i class="fas fa-save"></i> Save Medical Report
+                    </button>
+                    <button id="printReport" class="btn">
+                        <i class="fas fa-print"></i> Print Summary
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>This tool is designed to assist healthcare professionals. Always verify critical information.</p>
+            <p>All data is processed securely and complies with medical privacy regulations.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startBtn = document.getElementById('startRecording');
+            const stopBtn = document.getElementById('stopRecording');
+            const transcribeBtn = document.getElementById('transcribeBtn');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const saveBtn = document.getElementById('saveReport');
+            const printBtn = document.getElementById('printReport');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const transcript = document.getElementById('transcript');
+            const summary = document.getElementById('summary');
+            const keyPoints = document.getElementById('keyPoints');
+            const timer = document.getElementById('timer');
+            const waveform = document.getElementById('waveform');
+            const languageSelect = document.getElementById('languageSelect');
+            
+            let mediaRecorder;
+            let audioChunks = [];
+            let recording = false;
+            let startTime;
+            let timerInterval;
+            let waveformInterval;
+            
+            function generateWaveform() {
+                waveform.innerHTML = '';
+                for (let i = 0; i < 100; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'wave-bar';
+                    bar.style.left = i + '%';
+                    bar.style.height = Math.random() * 30 + 10 + 'px';
+                    waveform.appendChild(bar);
+                }
+            }
+            
+            generateWaveform();
+            
+            function animateWaveform() {
+                const bars = waveform.getElementsByClassName('wave-bar');
+                for (let bar of bars) {
+                    if (recording) {
+                        const newHeight = Math.random() * 50 + 15 + 'px';
+                        bar.style.height = newHeight;
+                    } else {
+                        bar.style.height = '5px';
+                    }
+                }
+            }
+            
+            startBtn.addEventListener('click', async function() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = function(event) {
+                        audioChunks.push(event.data);
+                    };
+                    
+                    mediaRecorder.onstop = function() {
+                        const audioBlob = new Blob(audioChunks, { 'type': 'audio/webm' });
+                        console.log('Audio recorded', audioBlob);
+                    };
+                    
+                    mediaRecorder.start();
+                    recording = true;
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    transcribeBtn.disabled = true;
+                    analyzeBtn.disabled = true;
+                    
+                    statusDot.classList.add('recording');
+                    statusText.textContent = 'Recording conversation...';
+                    
+                    startTime = new Date();
+                    timerInterval = setInterval(updateTimer, 1000);
+                    
+                    waveformInterval = setInterval(animateWaveform, 100);
+                    
+                    transcript.innerHTML = '<p><span class="speaker">System:</span> Recording started. Conversation will be transcribed in real-time.</p>';
+                    
+                } catch (error) {
+                    console.error('Error accessing microphone:', error);
+                    statusText.textContent = 'Microphone access denied. Please allow microphone permissions.';
+                }
+            });
+            
+            stopBtn.addEventListener('click', function() {
+                if (mediaRecorder && recording) {
+                    mediaRecorder.stop();
+                    recording = false;
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    transcribeBtn.disabled = false;
+                    
+                    statusDot.classList.remove('recording');
+                    statusText.textContent = 'Recording completed. Ready to transcribe.';
+                    
+                    clearInterval(timerInterval);
+                    clearInterval(waveformInterval);
+                    
+                    transcript.innerHTML += '<p><span class="speaker">System:</span> Recording stopped.</p>';
+                }
+            });
+            
+            function updateTimer() {
+                const now = new Date();
+                const elapsed = new Date(now - startTime);
+                const hours = elapsed.getUTCHours().toString().padStart(2, '0');
+                const minutes = elapsed.getUTCMinutes().toString().padStart(2, '0');
+                const seconds = elapsed.getUTCSeconds().toString().padStart(2, '0');
+                timer.textContent = `${hours}:${minutes}:${seconds}`;
+            }
+            
+            transcribeBtn.addEventListener('click', function() {
+                statusText.textContent = 'Transcribing conversation...';
+                transcribeBtn.disabled = true;
+                
+                setTimeout(() => {
+                    simulateTranscription();
+                    analyzeBtn.disabled = false;
+                    statusText.textContent = 'Transcription completed. Ready to analyze.';
+                }, 2000);
+            });
+            
+            analyzeBtn.addEventListener('click', function() {
+                statusText.textContent = 'Analyzing conversation with AI...';
+                analyzeBtn.disabled = true;
+                
+                setTimeout(() => {
+                    generateSummary();
+                    generateKeyPoints();
+                    saveBtn.disabled = false;
+                    statusText.textContent = 'Analysis completed. Summary available.';
+                }, 3000);
+            });
+            
+            saveBtn.addEventListener('click', function() {
+                statusText.textContent = 'Saving medical report...';
+                
+                setTimeout(() => {
+                    statusText.textContent = 'Report saved successfully.';
+                    alert('Medical report has been saved to the patient record.');
+                }, 1000);
+            });
+            
+            printBtn.addEventListener('click', function() {
+                window.print();
+            });
+            
+            function simulateTranscription() {
+                transcript.innerHTML = `
+                    <p><span class="speaker">Doctor:</span> Good morning. What brings you in today?</p>
+                    <p><span class="speaker">Patient:</span> I've been having headaches for the past week, and they're getting worse.</p>
+                    <p><span class="speaker">Doctor:</span> Can you describe the pain? Is it sharp, dull, throbbing?</p>
+                    <p><span class="speaker">Patient:</span> It's a throbbing pain, mostly on the right side of my head.</p>
+                    <p><span class="speaker">Doctor:</span> Any nausea, vomiting, or sensitivity to light?</p>
+                    <p><span class="speaker">Patient:</span> Yes, I've felt nauseous a few times, and bright lights make it worse.</p>
+                    <p><span class="speaker">Doctor:</span> Have you taken any medication for the pain?</p>
+                    <p><span class="speaker">Patient:</span> Just some paracetamol, but it doesn't seem to help much.</p>
+                    <p><span class="speaker">Doctor:</span> I see. Let me check your blood pressure and we'll go from there.</p>
+                `;
+            }
+            
+            function generateSummary() {
+                summary.innerHTML = `
+                    <p><strong>Conversation Summary:</strong> Patient presents with a one-week history of worsening headaches. Pain is described as throbbing, localized to the right side of the head. Associated symptoms include nausea and photophobia. Over-the-counter paracetamol provides minimal relief.</p>
+                    <p><strong>Initial Assessment:</strong> Symptoms suggestive of migraine headaches. Blood pressure measurement recommended to rule out hypertension as a contributing factor.</p>
+                    <p><strong>Next Steps:</strong> Perform physical examination, check blood pressure, consider neurological assessment if red flags present.</p>
+                `;
+            }
+            
+            function generateKeyPoints() {
+                keyPoints.innerHTML = `
+                    <div class="point-item critical">
+                        <strong><i class="fas fa-exclamation-triangle"></i> Critical:</strong> Headaches worsening over one-week period with associated nausea and photophobia
+                    </div>
+                    <div class="point-item important">
+                        <strong><i class="fas fa-lightbulb"></i> Important:</strong> Pain is throbbing and unilateral - common migraine characteristic
+                    </div>
+                    <div class="point-item">
+                        <strong><i class="fas fa-info-circle"></i> Note:</strong> Paracetamol ineffective - may require specific migraine medication
+                    </div>
+                    <div class="point-item important">
+                        <strong><i class="fas fa-lightbulb"></i> Action Item:</strong> Check blood pressure and perform neurological screening
+                    </div>
+                    <div class="point-item">
+                        <strong><i class="fas fa-info-circle"></i> Consider:</strong> Migraine prevention strategies if pattern continues
+                    </div>
+                `;
+            }
+            
+            languageSelect.addEventListener('change', function() {
+                statusText.textContent = `Language set to ${this.options[this.selectedIndex].text}. Ready to record.`;
+            });
+        });
+    </script>
+</body>
+</html>

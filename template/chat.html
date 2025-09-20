@@ -682,6 +682,13 @@
                         <p>Click body regions to indicate symptoms</p>
                     </div>
                 </div>
+                <div class="modal-option" id="conversationRecorder">
+                    <i class="fas fa-microphone"></i>
+                    <div>
+                        <strong>Conversation Recorder</strong>
+                        <p>Record and summarize consultations</p>
+                    </div>
+                </div>
                 <div class="modal-option" id="modalFindClinic">
                     <i class="fas fa-clinic-medical"></i>
                     <div>
@@ -766,18 +773,49 @@
                 });
             });
             
-            const featureCards = document.querySelectorAll('.feature-card');
-            featureCards.forEach(card => {
-                card.addEventListener('click', () => {
-                    const id = card.id;
-                    if (id === 'symptomCheck') {
-                        openSymptomChecker();
-                    } else if (id === 'bodyMap') {
-                        window.location.href = "/body_map";
-                    } else if (id === 'findClinic') {
-                        findClinic();
-                    }
-                });
+            document.getElementById('modalSymptomCheck').addEventListener('click', function() {
+                openSymptomChecker();
+                optionsModal.style.display = 'none';
+            });
+            
+            document.getElementById('modalBodyMap').addEventListener('click', function() {
+                window.location.href = "/body_map";
+            });
+            
+            document.getElementById('conversationRecorder').addEventListener('click', function() {
+                window.location.href = "/conversation_recorder";
+            });
+            
+            document.getElementById('modalFindClinic').addEventListener('click', function() {
+                findClinic();
+                optionsModal.style.display = 'none';
+            });
+            
+            document.getElementById('modalEmergencyHelp').addEventListener('click', function() {
+                optionsModal.style.display = 'none';
+                emergencyModal.style.display = 'flex';
+            });
+            
+            document.getElementById('modalMedicationInfo').addEventListener('click', function() {
+                addMessage("I can help with medication information. What medication would you like to know about?", 'bot');
+                optionsModal.style.display = 'none';
+            });
+            
+            document.getElementById('modalPrintSummary').addEventListener('click', function() {
+                printSummary();
+                optionsModal.style.display = 'none';
+            });
+            
+            document.getElementById('symptomCheck').addEventListener('click', function() {
+                openSymptomChecker();
+            });
+            
+            document.getElementById('bodyMap').addEventListener('click', function() {
+                window.location.href = "/body_map";
+            });
+            
+            document.getElementById('findClinic').addEventListener('click', function() {
+                findClinic();
             });
             
             addExtraBtn.addEventListener('click', () => {
@@ -795,6 +833,29 @@
                 });
             });
             
+            window.addEventListener('click', (e) => {
+                if (e.target === optionsModal) {
+                    optionsModal.style.display = 'none';
+                }
+                if (e.target === emergencyModal) {
+                    emergencyModal.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('callAmbulance').addEventListener('click', function() {
+                window.location.href = "tel:10177";
+                addMessage("Calling ambulance service...", 'bot');
+            });
+            
+            document.getElementById('nearestHospital').addEventListener('click', function() {
+                addMessage("Finding nearest hospital...", 'bot');
+            });
+            
+            document.getElementById('poisonControl').addEventListener('click', function() {
+                window.location.href = "tel:0861555777";
+                addMessage("Calling poison control...", 'bot');
+            });
+            
             function sendMessage() {
                 const message = userInput.value.trim();
                 if (message === '') return;
@@ -804,10 +865,25 @@
                 
                 typingIndicator.style.display = 'flex';
                 
-                setTimeout(() => {
+                fetch('/get', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        msg: message,
+                        lang: document.getElementById('languageSelect').value,
+                        session_id: sessionStorage.getItem('session_id') || 'default'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
                     typingIndicator.style.display = 'none';
-                    simulateAIResponse(message);
-                }, 1500);
+                    addMessage(data.answer || data.error || "I'm sorry, I couldn't process that request.", 'bot');
+                })
+                .catch(error => {
+                    typingIndicator.style.display = 'none';
+                    addMessage("Sorry, there was an error. Please try again.", 'bot');
+                    console.error('Error:', error);
+                });
             }
             
             function addMessage(text, sender) {
@@ -815,7 +891,7 @@
                 messageDiv.classList.add('message', sender);
                 
                 const messageText = document.createElement('div');
-                messageText.textContent = text;
+                messageText.innerHTML = text;
                 
                 const messageTime = document.createElement('div');
                 messageTime.classList.add('message-time');
@@ -828,23 +904,27 @@
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
             
-            function simulateAIResponse(userMessage) {
-                let response = '';
-                const lowerMessage = userMessage.toLowerCase();
+            function openSymptomChecker() {
+                addMessage("Opening symptom checker... Please describe your main symptom.", 'bot');
+            }
+            
+            function findClinic() {
+                addMessage("I'll help you find nearby clinics. Please share your location or area name.", 'bot');
+            }
+            
+            function printSummary() {
+                const messages = document.querySelectorAll('.message');
+                let content = '<h2>Consultation Summary</h2>';
+                messages.forEach(msg => {
+                    content += `<p>${msg.textContent}</p>`;
+                });
                 
-                if (lowerMessage.includes('headache') && lowerMessage.includes('fever')) {
-                    response = "Headache with fever can indicate several conditions. Have you recently traveled to malaria-risk areas? How long have you had these symptoms?";
-                } else if (lowerMessage.includes('stomach') || lowerMessage.includes('abdominal')) {
-                    response = "Abdominal pain can have various causes. Can you describe the pain? Is it sharp, dull, or cramping? Have you noticed any changes in bowel movements?";
-                } else if (lowerMessage.includes('clinic') || lowerMessage.includes('hospital')) {
-                    response = "I can help you find healthcare facilities. Please share your location or area so I can find clinics near you.";
-                } else if (lowerMessage.includes('hiv')) {
-                    response = "HIV symptoms may include fever, fatigue, swollen lymph nodes, and weight loss. Free testing and counseling are available at all public clinics in South Africa.";
-                } else {
-                    response = "Thank you for sharing. To better assist you, could you provide more details about your symptoms? For example, when they started, severity, and any other symptoms you're experiencing.";
-                }
-                
-                addMessage(response, 'bot');
+                const printWindow = window.open('', '', 'height=600,width=800');
+                printWindow.document.write('<html><head><title>Medical Summary</title></head><body>');
+                printWindow.document.write(content);
+                printWindow.document.write('</body></html>');
+                printWindow.document.close();
+                printWindow.print();
             }
             
             sendButton.addEventListener('click', sendMessage);
@@ -854,18 +934,12 @@
                 }
             });
             
-            function openSymptomChecker() {
-                addMessage("I'm opening the symptom checker. This will help us understand your symptoms better.", 'bot');
-                optionsModal.style.display = 'none';
-            }
-            
-            function findClinic() {
-                addMessage("Let me help you find healthcare facilities. Please enable location services or tell me your area.", 'bot');
-                optionsModal.style.display = 'none';
+            if (!sessionStorage.getItem('session_id')) {
+                sessionStorage.setItem('session_id', 'session_' + Date.now());
             }
             
             setTimeout(() => {
-                addMessage("Welcome! I'm EDI, your medical assistant. How can I help you today? You can describe symptoms, ask questions, or use the quick buttons below.", 'bot');
+                addMessage("Welcome! I'm EDI, your medical assistant. How can I help you today?", 'bot');
             }, 1000);
         });
     </script>

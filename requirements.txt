@@ -19,3 +19,9 @@ faiss-cpu==1.7.4
 SpeechRecognition==3.10.0
 pyaudio
 googletrans==4.0.0-rc1
+flask_sqlalchemy
+flask_login
+tensorflow-intel
+SpeechRecognition
+googletrans
+oauthlib
